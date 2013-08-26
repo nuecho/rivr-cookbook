@@ -1,0 +1,35 @@
+#Messages 
+
+##Playing speech synthesis
+
+DOWNLOAD|nuecho/rivr-cookbook|message-speech-synthesis|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-speech-synthesis|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-31|
+
+##Playing an audio file
+
+DOWNLOAD|nuecho/rivr-cookbook|message-audio-file|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-audio-file|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-32|
+
+##Playing an audio file with alternate synthesis text
+
+DOWNLOAD|nuecho/rivr-cookbook|message-audio-file-with-alternate|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-audio-file-with-alternate|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-33|
+
+##Playing SSML content
+
+DOWNLOAD|nuecho/rivr-cookbook|message-ssml|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-ssml|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|32-41|
+
+##Playing mutiple audio items
+
+DOWNLOAD|nuecho/rivr-cookbook|message-multiple-items|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-multiple-items|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-34|
+
+##Specifying message language
+
+INLINE_CODE|nuecho/rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|20-23|

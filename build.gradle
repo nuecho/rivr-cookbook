@@ -1,0 +1,45 @@
+task wrapper(type: Wrapper) { gradleVersion = '1.6' }
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+group = "com.nuecho"
+version = "1.0.0"
+sourceCompatibility = '1.6'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+eclipse {
+    classpath {
+        defaultOutputDir = file("${project.projectDir}/build/classes/main")
+        containers.clear()
+        containers.add("org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6")
+    }
+}
+
+dependencies { compile 'org.eclipse.jgit:org.eclipse.jgit:3.0.0.201306101825-r' }
+
+task wikiDoc (type: JavaExec) {
+    main = "com.nuecho.rivr.cookbook.wiki.WikiDocProcessor"
+    classpath = sourceSets.main.runtimeClasspath
+    args=[
+        "${project.projectDir}/doc/wiki.md.in",
+        "${project.projectDir}/doc/wiki.md",
+        "../cookbook",
+        "false"
+    ]
+}
+
+task wikiDocPandoc (type: JavaExec) {
+    main = "com.nuecho.rivr.cookbook.wiki.WikiDocProcessor"
+    classpath = sourceSets.main.runtimeClasspath
+    args=[
+        "${project.projectDir}/doc/wiki.md.in",
+        "${project.projectDir}/doc/wiki.md",
+        "../cookbook",
+        "true"
+    ]
+}
