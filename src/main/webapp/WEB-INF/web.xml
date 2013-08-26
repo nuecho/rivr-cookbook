@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+  <display-name>Dialogue Engine</display-name>
+
+  <servlet>
+    <servlet-name>Dialogue</servlet-name>
+    <servlet-class>com.nuecho.rivr.voicexml.servlet.VoiceXmlDialogueServlet</servlet-class>
+
+    <init-param>
+      <param-name>com.nuecho.rivr.voicexml.dialogue.class</param-name>
+      <param-value>com.nuecho.rivr.cookbook.dialogue.Dialogue</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Dialogue</servlet-name>
+    <url-pattern>/dialogue/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
