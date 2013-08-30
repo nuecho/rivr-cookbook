@@ -30,6 +30,34 @@ DOWNLOAD|nuecho/rivr-cookbook|message-multiple-items|
 
 INLINE_CODE|nuecho/rivr-cookbook|message-multiple-items|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-34|
 
+##Play a pause
+
+DOWNLOAD|nuecho/rivr-cookbook|message-pause|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-pause|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|30-32|
+
 ##Specifying message language
 
-INLINE_CODE|nuecho/rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|20-23|
+DOWNLOAD|nuecho/rivr-cookbook|message-language|
+
+INLINE_CODE|nuecho/rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-32|
+
+##Queuing a prompt with barge-in for the next interaction
+
+DOWNLOAD|nuecho/rivr-cookbook|message-barge-in|
+
+First, we need to disable to fetchaudio property. Maybe the platform default is already empty, but to make sure:
+ 
+INLINE_CODE|nuecho/rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|32-34|
+
+Then, we can queue the message with the barge-in flag set.  
+
+INLINE_CODE|nuecho/rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|36-42|
+
+Now, in the next interaction, the VoiceXML prompt queue will be flush because we are entering a _waiting state_. Since barge-in flag was set, the user can press a digit during the message and the interaction will complete.
+
+INLINE_CODE|nuecho/rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|44-49|
+
+# Call transfers
+
+## Blind Transfer
