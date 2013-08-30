@@ -61,3 +61,7 @@ INLINE_CODE|nuecho/rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/
 # Call transfers
 
 ## Blind Transfer
+
+DOWNLOAD|nuecho/rivr-cookbook|transfer-blind|
+
+INLINE_CODE|nuecho/rivr-cookbook|transfer-blind|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|20-28|
