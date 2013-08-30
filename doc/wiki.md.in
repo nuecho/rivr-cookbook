@@ -65,3 +65,19 @@ INLINE_CODE|nuecho/rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/
 DOWNLOAD|nuecho/rivr-cookbook|transfer-blind|
 
 INLINE_CODE|nuecho/rivr-cookbook|transfer-blind|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|20-28|
+
+## Consultation transfer
+
+DOWNLOAD|nuecho/rivr-cookbook|transfer-consultation|
+
+First, we need to prepare the interaction:
+
+INLINE_CODE|nuecho/rivr-cookbook|transfer-consultation|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|22-28|
+
+Now we have to deal with the result. First, we check for events:
+
+INLINE_CODE|nuecho/rivr-cookbook|transfer-consultation|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|30-35|
+
+Then, we check the status code:
+
+INLINE_CODE|nuecho/rivr-cookbook|transfer-consultation|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|36-49|
