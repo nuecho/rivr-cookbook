@@ -82,8 +82,7 @@ public class WikiDocProcessor {
 
                 String revisionUrl = "https://github.com/" + repositoryName + "/blob/" + branch + "/" + filename;
                 String rawUrl = "https://raw.github.com/" + repositoryName + "/" + branch + "/" + filename;
-                writer.println(filename + " [[raw]](" + rawUrl + ") [[revision]](" + revisionUrl + ")");
-                writer.println();
+                String justFilename = filename.substring(filename.lastIndexOf('/') + 1);
 
                 if (pandocMode) {
                     writer.println("~~~~{.java .numberLines startFrom=\"" + startLine + "\"}");
@@ -98,12 +97,13 @@ public class WikiDocProcessor {
                     writer.println("```");
                 }
                 writer.println();
+                writer.println("> " + justFilename + " [[raw]](" + rawUrl + ") [[revision]](" + revisionUrl + ")");
 
             } else if (downloadMarkMatcher.find()) {
                 String repositoryName = downloadMarkMatcher.group(1);
                 String branch = downloadMarkMatcher.group(2);
                 String url = "https://github.com/" + repositoryName + "/archive/" + branch + ".zip";
-                writer.println("[download](" + url + ") the complete code for this example");
+                writer.println("> [Download](" + url + ") the complete code for this example");
 
             } else {
                 writer.println(line);
