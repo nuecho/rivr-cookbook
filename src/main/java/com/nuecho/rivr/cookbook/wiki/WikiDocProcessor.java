@@ -5,6 +5,8 @@
 package com.nuecho.rivr.cookbook.wiki;
 
 import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.*;
 
 import org.eclipse.jgit.api.*;
@@ -16,6 +18,10 @@ import org.eclipse.jgit.lib.*;
  */
 public class WikiDocProcessor {
 
+    static final Pattern SECTION_1_MARK = Pattern.compile("^#(?!#)(.*)");
+    static final Pattern SECTION_2_MARK = Pattern.compile("^##(?!#)(.*)");
+    static final Pattern SECTION_3_MARK = Pattern.compile("^###(.*)");
+
     static final Pattern DOWNLOAD_MARK = Pattern.compile("DOWNLOAD\\|(.*?)\\|(.*?)\\|");
     static final Pattern INLINE_CODE_MARK = Pattern.compile("INLINE_CODE\\|(.*?)\\|(.*?)\\|(.*?)(\\|(\\d+)-(\\d+))?\\|");
     static final Pattern EOL = Pattern.compile("(\\r\\n|\\n)");
@@ -23,7 +29,7 @@ public class WikiDocProcessor {
 
     public static void main(String[] arguments) throws IOException, WikiDocProcessorException {
 
-        if (arguments.length < 3 || arguments.length > 4) {
+        if (arguments.length < 4 || arguments.length > 5) {
             System.out.println("usage:\n    java "
                                + WikiDocProcessor.class.getName()
                                + " inputFile outputFile gitRepository [pandocMode]");
@@ -31,13 +37,23 @@ public class WikiDocProcessor {
         }
 
         String inputFilename = arguments[0];
-        String outputFilename = arguments[1];
+        String outputDirectory = arguments[1];
         String repositoryPath = arguments[2];
+        String gitHubUser = arguments[3];
 
+        processFile(arguments, inputFilename, outputDirectory, repositoryPath, gitHubUser);
+    }
+
+    private static void processFile(String[] arguments,
+                                    String inputFilename,
+                                    String outputDirectory,
+                                    String repositoryPath,
+                                    String gitHubUser) throws IOException, UnsupportedEncodingException,
+            FileNotFoundException, AmbiguousObjectException, IncorrectObjectTypeException, WikiDocProcessorException {
         boolean pandocMode;
 
         if (arguments.length == 4) {
-            String pandocModeString = arguments[3];
+            String pandocModeString = arguments[4];
             pandocMode = Boolean.parseBoolean(pandocModeString);
         } else {
             pandocMode = false;
@@ -47,18 +63,41 @@ public class WikiDocProcessor {
         Repository repository = git.getRepository();
 
         File inputFile = new File(inputFilename);
-        File outputFile = new File(outputFilename);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "utf-8"));
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputFile), "utf-8"));
+        PrintWriter writer = new PrintWriter(new StringWriter());
 
         String line;
+        String currentSection1 = null;
+        String currentSection2 = null;
+        String currentSection3 = null;
+
+        Map<String, Map<String, List<String>>> tableOfContents = new LinkedHashMap<String, Map<String, List<String>>>();
+        Map<String, List<String>> sections2 = new HashMap<String, List<String>>();
+        List<String> sections3 = new ArrayList<String>();
+
         while (null != (line = reader.readLine())) {
 
             Matcher inlineCodeMatcher = INLINE_CODE_MARK.matcher(line);
             Matcher downloadMarkMatcher = DOWNLOAD_MARK.matcher(line);
+            Matcher section1MarkMatcher = SECTION_1_MARK.matcher(line);
+            Matcher section2MarkMatcher = SECTION_2_MARK.matcher(line);
+            Matcher section3MarkMatcher = SECTION_3_MARK.matcher(line);
 
-            if (inlineCodeMatcher.find()) {
+            if (section1MarkMatcher.find()) {
+                currentSection1 = section1MarkMatcher.group(1).trim();
+                sections2 = new LinkedHashMap<String, List<String>>();
+                tableOfContents.put(currentSection1, sections2);
+            } else if (section2MarkMatcher.find()) {
+                currentSection2 = section2MarkMatcher.group(1).trim();
+                sections3 = new ArrayList<String>();
+                sections2.put(currentSection2, sections3);
+            } else if (section3MarkMatcher.find()) {
+                writer.close();
+                currentSection3 = section3MarkMatcher.group(1).trim();
+                sections3.add(currentSection3);
+                writer = openFile(outputDirectory + "/" + normalizeFileName(currentSection3));
+            } else if (inlineCodeMatcher.find()) {
                 String repositoryName = inlineCodeMatcher.group(1);
                 String branch = inlineCodeMatcher.group(2);
                 String filename = inlineCodeMatcher.group(3);
@@ -80,8 +119,22 @@ public class WikiDocProcessor {
                 String inlinedFile = inlineCodeMatcher.replaceAll(lines);
                 inlinedFile = normalizeIndent(inlinedFile);
 
-                String revisionUrl = "https://github.com/" + repositoryName + "/blob/" + branch + "/" + filename;
-                String rawUrl = "https://raw.github.com/" + repositoryName + "/" + branch + "/" + filename;
+                String revisionUrl = "https://github.com/"
+                                     + gitHubUser
+                                     + "/"
+                                     + repositoryName
+                                     + "/blob/"
+                                     + branch
+                                     + "/"
+                                     + filename;
+                String rawUrl = "https://raw.github.com/"
+                                + gitHubUser
+                                + "/"
+                                + repositoryName
+                                + "/"
+                                + branch
+                                + "/"
+                                + filename;
                 String justFilename = filename.substring(filename.lastIndexOf('/') + 1);
 
                 if (pandocMode) {
@@ -97,12 +150,12 @@ public class WikiDocProcessor {
                     writer.println("```");
                 }
                 writer.println();
-                writer.println("> " + justFilename + " [[raw]](" + rawUrl + ") [[revision]](" + revisionUrl + ")");
+                writer.println("> " + justFilename + " [(raw)](" + rawUrl + ") [(revision)](" + revisionUrl + ")");
 
             } else if (downloadMarkMatcher.find()) {
                 String repositoryName = downloadMarkMatcher.group(1);
                 String branch = downloadMarkMatcher.group(2);
-                String url = "https://github.com/" + repositoryName + "/archive/" + branch + ".zip";
+                String url = "https://github.com/" + gitHubUser + "/" + repositoryName + "/archive/" + branch + ".zip";
                 writer.println("> [Download](" + url + ") the complete code for this example");
 
             } else {
@@ -111,6 +164,50 @@ public class WikiDocProcessor {
         }
 
         writer.close();
+        reader.close();
+
+        writeTableOfContents(outputDirectory, tableOfContents);
+
+    }
+
+    private static void writeTableOfContents(String outputDirectory,
+                                             Map<String, Map<String, List<String>>> tableOfContents)
+            throws UnsupportedEncodingException, FileNotFoundException {
+        writeTableOfContents(outputDirectory, tableOfContents, "Home.md");
+    }
+
+    private static void writeTableOfContents(String outputDirectory,
+                                             Map<String, Map<String, List<String>>> tableOfContents,
+                                             String filename) throws UnsupportedEncodingException,
+            FileNotFoundException {
+        PrintWriter tableOfContentsWriter = openFile(outputDirectory + "/" + filename);
+        for (Entry<String, Map<String, List<String>>> entry : tableOfContents.entrySet()) {
+            String section1Name = entry.getKey();
+            tableOfContentsWriter.println();
+            tableOfContentsWriter.println("1. " + section1Name);
+            tableOfContentsWriter.println();
+            for (Entry<String, List<String>> section2Entry : entry.getValue().entrySet()) {
+                tableOfContentsWriter.println("    1. " + section2Entry.getKey());
+                for (String section3Name : section2Entry.getValue()) {
+                    tableOfContentsWriter.println("        1. [[" + section3Name + "]]");
+                }
+            }
+        }
+
+        tableOfContentsWriter.close();
+    }
+
+    private static String normalizeFileName(String item) {
+        return normalizeWiki(item) + ".md";
+    }
+
+    private static String normalizeWiki(String item) {
+        return item.replaceAll("[^A-Za-z0-9 ]", "-");
+    }
+
+    private static PrintWriter openFile(String outputFilename) throws UnsupportedEncodingException,
+            FileNotFoundException {
+        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(outputFilename)), "utf-8"));
     }
 
     private static InputStream getBlobInputStream(Repository repository, String reference, String path)

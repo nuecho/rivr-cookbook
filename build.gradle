@@ -27,8 +27,9 @@ task wikiDoc (type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     args=[
         "${project.projectDir}/doc/wiki.md.in",
-        "${project.projectDir}/doc/wiki.md",
-        "../cookbook",
+        "${project.projectDir}/../rivr-cookbook.wiki/cookbook",
+        "${project.projectDir}",
+        "gawi",
         "false"
     ]
 }
@@ -38,8 +39,9 @@ task wikiDocPandoc (type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     args=[
         "${project.projectDir}/doc/wiki.md.in",
-        "${project.projectDir}/doc/wiki.md",
-        "../cookbook",
+        "${project.projectDir}/doc",
+        "${project.projectDir}",
+        "",
         "true"
     ]
 }
