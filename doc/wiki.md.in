@@ -42,7 +42,13 @@ INLINE_CODE|rivr-cookbook|message-pause|src/main/java/com/nuecho/rivr/cookbook/d
 
 DOWNLOAD|rivr-cookbook|message-language|
 
+For each message turn, you can set the `language` field:
+
 INLINE_CODE|rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-32|
+
+This can also be done globally at the VoiceXML level:
+
+INLINE_CODE|rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|34-44|
 
 ###Queuing a prompt with barge-in for the next interaction
 
