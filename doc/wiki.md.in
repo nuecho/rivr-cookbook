@@ -67,6 +67,44 @@ Now, in the next interaction, the VoiceXML prompt queue will be flush because we
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 44-49
 
+## Interactions
+
+### Collecting DTMF
+
+!set branch simple-dtmf-interaction
+
+This example show how to collect a DTMF string from the caller.  It involves the `InteractionTurn` which is created with the `InteractionBuilder`.
+
+The first thing we need to do is to create the `DtmfRecognitionConfiguration`.  This object contains the DTMF grammar used for DTMF recognition.  
+There are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification. We are going to use `digits`.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 57-59
+
+Then we need to build the interaction. We are going to instanciate an `InteractionBuilder` for this task.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60
+
+Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method. Here we just use a SynthesisText message. 
+
+To create the InteractionTurn itself, we invoke the `build()` method and we pass the `DtmfRecogntionConfiguration` object, meaning that we want to 
+perform DTMF recognition immediately after prompt are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-62
+
+Now that we have an `InteractionTurn`, we can execute it and receive the `InputTurn` which contains the result of this interaction.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
+
+We now need to inspect the result in order to know what has been done by the user.  We are going to deal with the following two outcomes
+
+1. The user has typed a number
+2. The user didn't enter anything
+  
+Actually, other outcomes are possible (e.g. hang-up, error) but we'll ignore that for now for the sake of simplicity.
+The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.  
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-74
+
 ## Call transfers
 
 ### Blind Transfer
