@@ -1,91 +1,92 @@
-#Output Turns
+!set repository rivr-cookbook
+# Output Turns
 
-##Messages 
+## Messages 
 
-###Playing speech synthesis
+### Playing speech synthesis
 
-DOWNLOAD|rivr-cookbook|message-speech-synthesis|
+!set branch message-speech-synthesis
 
-INLINE_CODE|rivr-cookbook|message-speech-synthesis|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-31|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-31
 
-###Playing an audio file
+### Playing an audio file
 
-DOWNLOAD|rivr-cookbook|message-audio-file|
+!set branch message-audio-file
 
-INLINE_CODE|rivr-cookbook|message-audio-file|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-32|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-32
 
-###Playing an audio file with alternate synthesis text
+### Playing an audio file with alternate synthesis text
 
-DOWNLOAD|rivr-cookbook|message-audio-file-with-alternate|
+!set branch message-audio-file-with-alternate
 
-INLINE_CODE|rivr-cookbook|message-audio-file-with-alternate|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-33|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-33
 
-###Playing SSML content
+### Playing SSML content
 
-DOWNLOAD|rivr-cookbook|message-ssml|
+!set branch message-ssml
 
-INLINE_CODE|rivr-cookbook|message-ssml|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|32-41|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 32-41
 
-###Playing mutiple audio items
+### Playing mutiple audio items
 
-DOWNLOAD|rivr-cookbook|message-multiple-items|
+!set branch message-multiple-items
 
-INLINE_CODE|rivr-cookbook|message-multiple-items|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-34|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-34
 
-###Playing a pause
+### Playing a pause
 
-DOWNLOAD|rivr-cookbook|message-pause|
+!set branch message-pause
 
-INLINE_CODE|rivr-cookbook|message-pause|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|30-32|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-32
 
-###Specifying message language
+### Specifying message language
 
-DOWNLOAD|rivr-cookbook|message-language|
+!set branch message-language
 
 For each message turn, you can set the `language` field:
 
-INLINE_CODE|rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|29-32|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-32
 
 This can also be done globally at the VoiceXML level:
 
-INLINE_CODE|rivr-cookbook|message-language|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|34-44|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 34-44
 
-###Queuing a prompt with barge-in for the next interaction
+### Queuing a prompt with barge-in for the next interaction
 
-DOWNLOAD|rivr-cookbook|message-barge-in|
+!set branch message-barge-in
 
 First, we need to disable to fetchaudio property. Maybe the platform default is already empty, but to make sure:
  
-INLINE_CODE|rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|32-34|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 32-34
 
 Then, we can queue the message with the barge-in flag set.  
 
-INLINE_CODE|rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|36-42|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-42
 
 Now, in the next interaction, the VoiceXML prompt queue will be flush because we are entering a _waiting state_. Since barge-in flag was set, the user can press a digit during the message and the interaction will complete.
 
-INLINE_CODE|rivr-cookbook|message-barge-in|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|44-49|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 44-49
 
 ## Call transfers
 
 ### Blind Transfer
 
-DOWNLOAD|rivr-cookbook|transfer-blind|
+!set branch transfer-blind
 
-INLINE_CODE|rivr-cookbook|transfer-blind|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|20-28|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 20-28
 
 ### Consultation transfer
 
-DOWNLOAD|rivr-cookbook|transfer-consultation|
+!set branch transfer-consultation
 
 First, we need to prepare the interaction:
 
-INLINE_CODE|rivr-cookbook|transfer-consultation|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|22-28|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 22-28
 
 Now we have to deal with the result. First, we check for events:
 
-INLINE_CODE|rivr-cookbook|transfer-consultation|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|30-35|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-35
 
 Then, we check the status code:
 
-INLINE_CODE|rivr-cookbook|transfer-consultation|src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java|36-49|
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-49

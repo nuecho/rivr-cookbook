@@ -4,6 +4,8 @@
 
 package com.nuecho.rivr.cookbook.wiki;
 
+import static java.lang.String.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -22,8 +24,8 @@ public class WikiDocProcessor {
     static final Pattern SECTION_2_MARK = Pattern.compile("^##(?!#)(.*)");
     static final Pattern SECTION_3_MARK = Pattern.compile("^###(.*)");
 
-    static final Pattern DOWNLOAD_MARK = Pattern.compile("DOWNLOAD\\|(.*?)\\|(.*?)\\|");
-    static final Pattern INLINE_CODE_MARK = Pattern.compile("INLINE_CODE\\|(.*?)\\|(.*?)\\|(.*?)(\\|(\\d+)-(\\d+))?\\|");
+    static final Pattern SET_MARK = Pattern.compile("!set\\s+(.+?)\\s+(.+)");
+    static final Pattern INLINE_CODE_MARK = Pattern.compile("!inline\\s+(\\S+)(\\s+(\\d+)-(\\d+))?");
     static final Pattern EOL = Pattern.compile("(\\r\\n|\\n)");
     static final Pattern INDENT = Pattern.compile("^\\s+");
 
@@ -52,7 +54,7 @@ public class WikiDocProcessor {
             FileNotFoundException, AmbiguousObjectException, IncorrectObjectTypeException, WikiDocProcessorException {
         boolean pandocMode;
 
-        if (arguments.length == 4) {
+        if (arguments.length == 5) {
             String pandocModeString = arguments[4];
             pandocMode = Boolean.parseBoolean(pandocModeString);
         } else {
@@ -65,109 +67,187 @@ public class WikiDocProcessor {
         File inputFile = new File(inputFilename);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "utf-8"));
-        PrintWriter writer = new PrintWriter(new StringWriter());
+        PrintWriter writer;
+
+        if (pandocMode) {
+            writer = openFile(outputDirectory + "/wiki.md");
+        } else {
+            writer = new PrintWriter(new StringWriter());
+        }
 
         String line;
         String currentSection1 = null;
         String currentSection2 = null;
         String currentSection3 = null;
+        String currentBranch = null;
+        String currentRepository = null;
 
         Map<String, Map<String, List<String>>> tableOfContents = new LinkedHashMap<String, Map<String, List<String>>>();
         Map<String, List<String>> sections2 = new HashMap<String, List<String>>();
         List<String> sections3 = new ArrayList<String>();
 
-        while (null != (line = reader.readLine())) {
+        int lineNumber = 0;
+        boolean inSection = false;
+        try {
+            while (null != (line = reader.readLine())) {
+                lineNumber++;
+                Matcher setMarkMatcher = SET_MARK.matcher(line);
+                Matcher inlineCodeMatcher = INLINE_CODE_MARK.matcher(line);
+                Matcher section1MarkMatcher = SECTION_1_MARK.matcher(line);
+                Matcher section2MarkMatcher = SECTION_2_MARK.matcher(line);
+                Matcher section3MarkMatcher = SECTION_3_MARK.matcher(line);
 
-            Matcher inlineCodeMatcher = INLINE_CODE_MARK.matcher(line);
-            Matcher downloadMarkMatcher = DOWNLOAD_MARK.matcher(line);
-            Matcher section1MarkMatcher = SECTION_1_MARK.matcher(line);
-            Matcher section2MarkMatcher = SECTION_2_MARK.matcher(line);
-            Matcher section3MarkMatcher = SECTION_3_MARK.matcher(line);
+                if (section1MarkMatcher.find()) {
+                    if (inSection) {
+                        generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository, pandocMode);
+                        inSection = false;
+                    }
 
-            if (section1MarkMatcher.find()) {
-                currentSection1 = section1MarkMatcher.group(1).trim();
-                sections2 = new LinkedHashMap<String, List<String>>();
-                tableOfContents.put(currentSection1, sections2);
-            } else if (section2MarkMatcher.find()) {
-                currentSection2 = section2MarkMatcher.group(1).trim();
-                sections3 = new ArrayList<String>();
-                sections2.put(currentSection2, sections3);
-            } else if (section3MarkMatcher.find()) {
-                writer.close();
-                currentSection3 = section3MarkMatcher.group(1).trim();
-                sections3.add(currentSection3);
-                writer = openFile(outputDirectory + "/" + normalizeFileName(currentSection3));
-            } else if (inlineCodeMatcher.find()) {
-                String repositoryName = inlineCodeMatcher.group(1);
-                String branch = inlineCodeMatcher.group(2);
-                String filename = inlineCodeMatcher.group(3);
+                    currentSection1 = section1MarkMatcher.group(1).trim();
+                    sections2 = new LinkedHashMap<String, List<String>>();
+                    if (pandocMode) {
+                        writer.println("# " + currentSection1);
+                    }
+                    tableOfContents.put(currentSection1, sections2);
 
-                int startLine;
-                int stopLine;
+                } else if (section2MarkMatcher.find()) {
+                    if (inSection) {
+                        generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository, pandocMode);
+                        inSection = false;
+                    }
 
-                String lineNumbers = inlineCodeMatcher.group(4);
-                if (lineNumbers != null) {
-                    startLine = Integer.parseInt(inlineCodeMatcher.group(5));
-                    stopLine = Integer.parseInt(inlineCodeMatcher.group(6));
+                    currentSection2 = section2MarkMatcher.group(1).trim();
+                    sections3 = new ArrayList<String>();
+                    if (pandocMode) {
+                        writer.println("## " + currentSection2);
+                    }
+                    sections2.put(currentSection2, sections3);
+
+                } else if (section3MarkMatcher.find()) {
+                    currentSection3 = section3MarkMatcher.group(1).trim();
+                    sections3.add(currentSection3);
+
+                    if (inSection) {
+                        generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository, pandocMode);
+                        inSection = false;
+                    }
+
+                    inSection = true;
+
+                    if (!pandocMode) {
+                        writer.close();
+                        writer = openFile(outputDirectory + "/" + normalizeFileName(currentSection3));
+                    } else {
+                        writer.println("### " + currentSection3);
+                    }
+
+                } else if (inlineCodeMatcher.find()) {
+                    String filename = inlineCodeMatcher.group(1);
+
+                    int startLine;
+                    int stopLine;
+
+                    String lineNumbers = inlineCodeMatcher.group(2);
+                    if (lineNumbers != null) {
+                        startLine = Integer.parseInt(inlineCodeMatcher.group(3));
+                        stopLine = Integer.parseInt(inlineCodeMatcher.group(4));
+                    } else {
+                        startLine = 0;
+                        stopLine = Integer.MAX_VALUE;
+                    }
+
+                    InputStream blobInputStream = getBlobInputStream(repository, currentBranch, filename);
+                    String lines = getFileLines(startLine, stopLine, blobInputStream);
+                    String inlinedFile = inlineCodeMatcher.replaceAll(lines);
+                    inlinedFile = normalizeIndent(inlinedFile);
+
+                    String revisionUrl = "https://github.com/"
+                                         + gitHubUser
+                                         + "/"
+                                         + currentRepository
+                                         + "/blob/"
+                                         + currentBranch
+                                         + "/"
+                                         + filename;
+
+                    String justFilename = filename.substring(filename.lastIndexOf('/') + 1);
+                    writer.println(">    [_" + justFilename + "_](" + revisionUrl + "):\n");
+
+                    if (pandocMode) {
+                        writer.println("~~~~{.java .numberLines startFrom=\"" + startLine + "\"}");
+                    } else {
+                        writer.println("```java");
+                    }
+                    writer.print(inlinedFile);
+
+                    if (pandocMode) {
+                        writer.println("~~~~");
+                    } else {
+                        writer.println("```");
+                    }
+                    writer.println();
+                } else if (setMarkMatcher.find()) {
+                    String key = setMarkMatcher.group(1);
+                    String value = setMarkMatcher.group(2);
+                    if (key.equals("branch")) {
+                        currentBranch = value;
+                    } else if (key.equals("repository")) {
+                        currentRepository = value;
+                    } else throw new WikiDocProcessorException("Unknown key '" + key + "' at line " + lineNumber);
                 } else {
-                    startLine = 0;
-                    stopLine = Integer.MAX_VALUE;
+                    writer.println(line);
                 }
-
-                InputStream blobInputStream = getBlobInputStream(repository, branch, filename);
-                String lines = getFileLines(startLine, stopLine, blobInputStream);
-                String inlinedFile = inlineCodeMatcher.replaceAll(lines);
-                inlinedFile = normalizeIndent(inlinedFile);
-
-                String revisionUrl = "https://github.com/"
-                                     + gitHubUser
-                                     + "/"
-                                     + repositoryName
-                                     + "/blob/"
-                                     + branch
-                                     + "/"
-                                     + filename;
-                String rawUrl = "https://raw.github.com/"
-                                + gitHubUser
-                                + "/"
-                                + repositoryName
-                                + "/"
-                                + branch
-                                + "/"
-                                + filename;
-                String justFilename = filename.substring(filename.lastIndexOf('/') + 1);
-
-                if (pandocMode) {
-                    writer.println("~~~~{.java .numberLines startFrom=\"" + startLine + "\"}");
-                } else {
-                    writer.println("```java");
-                }
-                writer.print(inlinedFile);
-
-                if (pandocMode) {
-                    writer.println("~~~~");
-                } else {
-                    writer.println("```");
-                }
-                writer.println();
-                writer.println("> " + justFilename + " [(raw)](" + rawUrl + ") [(revision)](" + revisionUrl + ")");
-
-            } else if (downloadMarkMatcher.find()) {
-                String repositoryName = downloadMarkMatcher.group(1);
-                String branch = downloadMarkMatcher.group(2);
-                String url = "https://github.com/" + gitHubUser + "/" + repositoryName + "/archive/" + branch + ".zip";
-                writer.println("> [Download](" + url + ") the complete code for this example");
-
-            } else {
-                writer.println(line);
             }
+
+            generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository, pandocMode);
+
+            if (!pandocMode) {
+                writeTableOfContents(outputDirectory, tableOfContents);
+            }
+        } finally {
+            writer.close();
+            reader.close();
         }
 
-        writer.close();
-        reader.close();
+    }
 
-        writeTableOfContents(outputDirectory, tableOfContents);
+    private static void generateSectionFooter(String gitHubUser,
+                                              PrintWriter writer,
+                                              String branch,
+                                              String repository,
+                                              boolean pandocMode) {
+        if (branch == null) return;
 
+        if (!pandocMode) {
+            writer.println();
+            writer.println("---------------------------");
+        }
+        writer.println();
+        writer.println("#### Running this example");
+
+        String downloadUrl = "https://github.com/" + gitHubUser + "/" + repository + "/archive/" + branch + ".zip";
+        String browseUrl = "https://github.com/" + gitHubUser + "/" + repository + "/tree/" + branch;
+
+        writer.println(format("You can [download](%s) or [browse](%s) the complete code for this example at GitHub."
+                                      + "This is a complete working application that you can build and run for yourself.",
+                              downloadUrl,
+                              browseUrl));
+        writer.println();
+        writer.println("You can also clone the Rivr Cookbook repository and checkout this example:");
+        writer.println();
+        writer.println("`git clone -b " + branch + " git@github.com:" + gitHubUser + "/" + repository + ".git`");
+        writer.println();
+        writer.println("Then, to build and run it:");
+        writer.println();
+        writer.println("`cd " + repository + "`");
+        writer.println();
+        writer.println("`./gradlew jettyRun`");
+        writer.println();
+        writer.println("The VoiceXML dialogue should be available at ");
+        writer.println("[http://localhost:8080/rivr-cookbook/dialogue](http://localhost:8080/rivr-cookbook/dialogue)");
+        writer.println();
+        writer.println("To stop the application, press Control-C in the console.");
+        writer.println();
     }
 
     private static void writeTableOfContents(String outputDirectory,
@@ -181,6 +261,12 @@ public class WikiDocProcessor {
                                              String filename) throws UnsupportedEncodingException,
             FileNotFoundException {
         PrintWriter tableOfContentsWriter = openFile(outputDirectory + "/" + filename);
+        writeTableOfContents(tableOfContents, tableOfContentsWriter);
+        tableOfContentsWriter.close();
+    }
+
+    private static void writeTableOfContents(Map<String, Map<String, List<String>>> tableOfContents,
+                                             PrintWriter tableOfContentsWriter) {
         for (Entry<String, Map<String, List<String>>> entry : tableOfContents.entrySet()) {
             String section1Name = entry.getKey();
             tableOfContentsWriter.println();
@@ -193,8 +279,6 @@ public class WikiDocProcessor {
                 }
             }
         }
-
-        tableOfContentsWriter.close();
     }
 
     private static String normalizeFileName(String item) {
@@ -220,7 +304,8 @@ public class WikiDocProcessor {
         ObjectLoader objectLoader = repository.getObjectDatabase().open(objectId);
 
         int type = objectLoader.getType();
-        if (type != Constants.OBJ_BLOB) throw new WikiDocProcessorException("Path does not refer to a BLOB.");
+        if (type != Constants.OBJ_BLOB)
+            throw new WikiDocProcessorException("Path '" + path + "' does not refer to a BLOB.");
 
         return objectLoader.openStream();
     }
