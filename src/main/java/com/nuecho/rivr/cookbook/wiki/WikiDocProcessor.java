@@ -316,20 +316,11 @@ public class WikiDocProcessor {
         StringBuilder builder = new StringBuilder();
         String line;
 
-        int lineNumber = 0;
-        while (null != (line = reader.readLine())) {
-            lineNumber++;
-
-            if (lineNumber < startLine) {
-                continue;
+        for (int lineNumber = 1; lineNumber <= stopLine && null != (line = reader.readLine()); lineNumber++) {
+            if (lineNumber >= startLine) {
+                builder.append(line);
+                builder.append('\n');
             }
-
-            if (lineNumber > stopLine) {
-                break;
-            }
-
-            builder.append(line);
-            builder.append('\n');
         }
 
         return builder.toString();
