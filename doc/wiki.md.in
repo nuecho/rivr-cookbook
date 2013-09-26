@@ -166,3 +166,48 @@ Now we have to deal with the result. First, we check for events:
 Then, we check the status code:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-49
+
+# Other recipes
+
+## Getting information from the platform
+
+### Getting CLID and DNIS
+
+!set branch clid-dnis
+
+This example show how to get the CLID (also known as ANI) and DNIS from the VoiceXML platform. To do that, we need to read two read-only 
+[variables specified by the VoiceXML specification](http://www.w3.org/TR/voicexml20/#dml5.1.4):
+
+> `session.connection.local.uri`
+
+>> This variable is a URI which addresses the local interpreter context device.
+
+> `session.connection.remote.uri`
+
+>> This variable is a URI which addresses the remote caller device.
+
+To create a VoiceXML document reading platform variables, we use the `ScriptExecutionTurn`.  This turn will generate a VoiceXML document that will perform the following step:
+
+1. Initialize some variables with some optional expression.
+2. Execute an optional script
+3. Send back the variables to the server 
+
+Here, we will only need to initialize two variables and send the result back to our dialogue, no need for a script here as initial value assignment is enough.  
+To define the variables and initial expression, we use the `VariableDeclarationList` class:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 23-25
+
+Then we create the `scriptExecutionTurn` with theses variable definitions:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 27-28
+
+We execute the turn:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-30
+
+To retrieve the result, we cast the `inputTurn.getValue()` into a `JsonObject`.  The affected values for the variables can be obtained as property of this object:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 32-35
+
+Note that the CLID and DNIS obtained this way are URI. If you have a SIP IVR platform integrated with the PSTN, you are likely to get SIP URI (e.g. `sip:+15145551234@proxy.example.com`) so you probably need to do 
+some parsing in order to extract the numeric value of the SIP URI.
