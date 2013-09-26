@@ -105,6 +105,44 @@ The InputTurn contains a `recognitionInfo` property which gives us acces to the 
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-74
 
+### Collecting DTMF with interruptible message
+
+!set branch barge-in-dtmf-interaction
+
+This example is very similar to [[Collecting DTMF]].  Here, we will allow the user to type the number while the prompt is being played. This behaviour is also known as _barge-in_.
+
+In order to do that, we use a diffent signature of the `addPrompt` method.  We use the one where you can specify a `DtmfRecognitionConfiguration`:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-64
+
+The `DtmfRecognitionConfiguration` object is used twice in this statement. It is important to understand why:
+ 
+1. The fact that we specify a `DtmfRecognitionConfiguration` _in the `addPrompt()` method_ indicates that the user can perform input _while the prompt is playing_.
+2. The fact that we specify a `DtmfRecognitionConfiguration` _in the `build()` method_ indicates that the user can also perform input _after the prompts are played_.
+
+### Interruptible message
+
+!set branch interruptible-message
+
+Sometime, it is required to play a message while giving the caller a way to interrupt it and skip the rest of it. The following example explains how to do that.
+
+First, we need to specify a DTMF grammar accepting a single digit: 
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 54-55
+
+We also reset the DTMF termination character as we want to make the pound key (#) a DTMF input. 
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 56-56
+
+Then we create the interaction using the `InteractionBuilder` and we only set the `DtmfRecognitionConfiguration` for the prompt.  
+There is no parameter in the `build()` method since we do not want to perform recognition once the message is played.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 58-64
+
+If we need to check if the prompt has been interrupted, we can check if we got any DTMF recognition (a digit) or a no-match event (pound or asterisk).
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-75
+
 ## Call transfers
 
 ### Blind Transfer
