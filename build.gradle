@@ -29,7 +29,7 @@ task wikiDoc (type: JavaExec) {
         "${project.projectDir}/doc/wiki.md.in",
         "${project.projectDir}/../rivr-cookbook.wiki/cookbook",
         "${project.projectDir}",
-        "gawi",
+        "nuecho",
         "false"
     ]
 }
@@ -41,7 +41,7 @@ task wikiDocPandoc (type: JavaExec) {
         "${project.projectDir}/doc/wiki.md.in",
         "${project.projectDir}/doc",
         "${project.projectDir}",
-        "gawi",
+        "nuecho",
         "true"
     ]
 }
