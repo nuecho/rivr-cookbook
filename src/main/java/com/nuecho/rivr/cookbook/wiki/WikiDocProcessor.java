@@ -158,8 +158,7 @@ public class WikiDocProcessor {
 
                     InputStream blobInputStream = getBlobInputStream(repository, currentBranch, filename);
                     String lines = getFileLines(startLine, stopLine, blobInputStream);
-                    String inlinedFile = inlineCodeMatcher.replaceAll(lines);
-                    inlinedFile = normalizeIndent(inlinedFile);
+                    String inlinedFile = normalizeIndent(lines);
 
                     String revisionUrl = "https://github.com/"
                                          + gitHubUser
