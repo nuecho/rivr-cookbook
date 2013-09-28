@@ -120,6 +120,42 @@ The `DtmfRecognitionConfiguration` object is used twice in this statement. It is
 1. The fact that we specify a `DtmfRecognitionConfiguration` _in the `addPrompt()` method_ indicates that the user can perform input _while the prompt is playing_.
 2. The fact that we specify a `DtmfRecognitionConfiguration` _in the `build()` method_ indicates that the user can also perform input _after the prompts are played_.
 
+### DTMF recognition options
+
+!set branch dtmf-options
+
+This example shows how to tune DTMF recognition. The parameters describe here are explained in detail in the VoiceXML specification, 
+[Section 6.3.3](http://www.w3.org/TR/voicexml20/#dml6.3.3) and [Appendix D - Timing Properties / DTMF Grammar](http://www.w3.org/TR/voicexml20/#L9212)
+
+Let's start by having a grammar accepting a DTMF string between 5 and 10 digits long.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 57-58
+
+Now let's configure the _inter-digit time-out_, i.e. the maximum pause duration between the input of two consecutive digits before the input is considered finished. 
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 59-59 
+
+Another option you can configure is the DTMF _term char_, i.e. the DMTF key the caller can press in order to terminate the input.  
+This is the DTMF equivalent of the _Enter_ key.  So the user can press the DTMF _term char_ once the input is done, 
+not having to wait for the _inter-digit time-out_.  
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60 
+
+The last parameter is _term time-out_, i.e. the time given to enter the term char once
+when no other character can be accepted (in our exemple, after the 10th digit). The idea is to put a value 
+for _term time-out_ that is shorter than _inter-digit time-out_ value.  
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61 
+
+The `DtmfRecognitionConfiguration` can now be used to build the `InteractionTurn`. 
+Note that the time-out specify here (2 seconds) is the _no-input time-out_ (or simply _timeout_ in the VoiceXML terminology):
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-65
+
+You can then perform the DTMF recognition by executing the turn:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 67-79
+
 ### Interruptible message
 
 !set branch interruptible-message
