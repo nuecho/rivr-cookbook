@@ -120,6 +120,50 @@ The `DtmfRecognitionConfiguration` object is used twice in this statement. It is
 1. The fact that we specify a `DtmfRecognitionConfiguration` _in the `addPrompt()` method_ indicates that the user can perform input _while the prompt is playing_.
 2. The fact that we specify a `DtmfRecognitionConfiguration` _in the `build()` method_ indicates that the user can also perform input _after the prompts are played_.
 
+### Using a DTMF grammar
+
+!set branch dtmf-grammar
+
+This example shows how to use a DTMF grammar to define what should be accepted during DTMF recognition.
+
+Here a grammar that will accept all North-American valid phone number:
+ 
+!inline src/main/webapp/grammars/phone-number.grxml
+
+Here's how this should be use in the dialogue:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 57-64
+
+Since the grammar is very simple and it doesn't provide semantic interpration, the result can be obtain
+by getting the _utterance_ property of the recognition result. 
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-76
+
+### Using a DTMF grammar having semantic tags
+
+!set branch dtmf-grammar-with-semantic
+
+In the other DTMF recognition examples where a built-in grammar was used, we have rather used the _interpretation_ property of the
+recognition result because built-in grammars provide a _semantic interpretation_. It is better to work with the interpretation than the raw utterance.  
+
+In our previous example ([[Using a DTMF grammar]]), the optional "1" will be part of the result if the caller  has pressed the key, so we must deal with the fact that
+it may be present or not.  In other word, we need to do the normalization in the dialogue.   It's also possible that DTMF _utterance_ will
+contains space between each digits (i.e. `5 1 4 5 5 5 1 2 3 4`), so there another normalization to do there also.  
+
+If the grammar provide semantic tags, you have control over what is returned in the recognition result.
+Moreover, if you are performing speech recognition and DTMF recognition at once, you can return the same format for the interpretation regardless 
+of the input mode (i.e. DTMF or speech), making it easier to process in the dialog.
+ 
+Here the phone number grammar modified with semantic tags:
+ 
+!inline src/main/webapp/grammars/phone-number.grxml 9-42
+
+Here's how to access the result:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-76
+
+Note that the phone number does not need anymore normalization at this point. The optional country code will not be part of the interpretation.
+
 ### DTMF recognition options
 
 !set branch dtmf-options
