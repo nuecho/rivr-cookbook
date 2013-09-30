@@ -87,7 +87,7 @@ Then we need to build the interaction. We are going to instanciate an `Interacti
 Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method. Here we just use a SynthesisText message. 
 
 To create the InteractionTurn itself, we invoke the `build()` method and we pass the `DtmfRecogntionConfiguration` object, meaning that we want to 
-perform DTMF recognition immediately after prompt are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
+perform DTMF recognition immediately after prompts are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-62
 
@@ -222,6 +222,43 @@ There is no parameter in the `build()` method since we do not want to perform re
 If we need to check if the prompt has been interrupted, we can check if we got any DTMF recognition (a digit) or a no-match event (pound or asterisk).
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-75
+
+### Performing speech-recognition
+
+!set branch simple-speech-interaction
+
+This example show how to perform speech recognition.  Like DTMF recognition, it involves the `InteractionTurn` which is created with the `InteractionBuilder`.
+
+The first thing we need to do is to create the `SpeechRecognitionConfiguration`.  This object contains the speech grammar used for speech recognition.  
+There are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification. We are going to use `digits`.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 57-59
+
+Then we need to build the interaction. We are going to instanciate an `InteractionBuilder` for this task.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60
+
+Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method. Here we just use a SynthesisText message. 
+
+To create the InteractionTurn itself, we invoke the `build()` method and we pass the `SpeechRecogntionConfiguration` object, meaning that we want to 
+perform speech recognition immediately after prompts are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-62
+
+Now that we have an `InteractionTurn`, we can execute it and receive the `InputTurn` which contains the result of this interaction.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
+
+We now need to inspect the result in order to know what has been done by the user.  We are going to deal with the following two outcomes
+
+1. The user said some digits
+1. The user said something that could not be understood
+2. The user didn't say anything
+  
+Actually, other outcomes are possible (e.g. hang-up, error) but we'll ignore that for now for the sake of simplicity.
+The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.  
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-76
 
 ## Call transfers
 
