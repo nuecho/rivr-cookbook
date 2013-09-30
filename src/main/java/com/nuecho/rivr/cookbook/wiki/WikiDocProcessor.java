@@ -217,10 +217,8 @@ public class WikiDocProcessor {
                                               boolean pandocMode) {
         if (branch == null) return;
 
-        if (!pandocMode) {
-            writer.println();
-            writer.println("---------------------------");
-        }
+        if (pandocMode) return;
+
         writer.println();
         writer.println("#### Running this example");
 
