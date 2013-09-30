@@ -56,8 +56,16 @@ public class Dialogue implements VoiceXmlDialogue {
     public VoiceXmlLastTurn run(VoiceXmlFirstTurn firstTurn, VoiceXmlDialogueContext context)
             throws Exception {
 
-        GrammarItem speechGrammar = new GrammarReference("builtin:grammar/digits");
+        GrammarItem speechGrammar = new GrammarReference("builtin:grammar/digits?minlength=5&maxlength=10");
         SpeechRecognition speechRecognition = new SpeechRecognition(speechGrammar);
+
+        speechRecognition.setConfidenceLevel(0.30);
+        speechRecognition.setMaxNBest(5);
+        speechRecognition.setIncompleteTimeout(Duration.milliseconds(2500));
+        speechRecognition.setCompleteTimeout(Duration.milliseconds(1000));
+        speechRecognition.setMaxSpeechTimeout(Duration.seconds(8));
+        speechRecognition.setSensitivity(0.46);
+        speechRecognition.setSpeedVersusAccuracy(0.80);
 
         Interaction interaction = interaction("get-speech")
                 .addPrompt(new SpeechSynthesis("Say some digits."))
@@ -80,5 +88,4 @@ public class Dialogue implements VoiceXmlDialogue {
         //end of dialogue
         return new Exit("exit");
     }
-
 }
