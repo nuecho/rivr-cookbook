@@ -220,6 +220,8 @@ public class WikiDocProcessor {
         if (pandocMode) return;
 
         writer.println();
+        writer.println("---------------------------");
+        writer.println();
         writer.println("#### Running this example");
 
         String downloadUrl = "https://github.com/" + gitHubUser + "/" + repository + "/archive/" + branch + ".zip";
