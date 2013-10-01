@@ -249,7 +249,7 @@ Now that we have an `InteractionTurn`, we can execute it and receive the `InputT
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
 
-We now need to inspect the result in order to know what has been done by the user.  We are going to deal with the following two outcomes
+We now need to inspect the result in order to know what has been done by the user.  We are going to deal with the following three outcomes
 
 1. The user said some digits
 1. The user said something that could not be understood
@@ -259,6 +259,13 @@ Actually, other outcomes are possible (e.g. hang-up, error) but we'll ignore tha
 The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.  
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-76
+
+### Speech recognition options
+
+!branch speech-options
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60
+
 
 ## Call transfers
 
@@ -283,6 +290,51 @@ Now we have to deal with the result. First, we check for events:
 Then, we check the status code:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-49
+
+# Integration
+
+## Server-side integration
+
+### Spring framework integration
+
+!set branch spring
+
+There are so many ways you can leverage the [Spring framework](http://projects.spring.io/spring-framework/). 
+This example will show you how to provide a custom dialogue factory that will create VoiceXmlDialogue objects 
+from the Spring bean factory.
+
+The first step is to create a Dialogue as a Java bean:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 17-39
+ 
+Note that this dialogue has a mandatory _message_ property.
+
+Now in the bean factory configuration file, we can provide some definitions for some _dialogue beans_:
+
+!inline src/main/webapp/WEB-INF/applicationContext.xml
+
+We make those beans as _prototype_, meaning that they are reinstanciated each time they are requested. This is required
+if the dialogue class is stateful (which is not really the case in our example).  A stateless dialogue bean can be 
+shared across many "phone calls" while a stateful dialogue bean can only used by one call.
+
+You need to set the application context in the web.xml:
+
+!inline src/main/webapp/WEB-INF/web.xml 11-13
+
+We can define a custom dialogue factory that will lookup the dialogue in the bean factory according to 
+the value of the `dialogue` HTTP parameter:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/DialogueFactory.java 20-49
+
+You need to place the name of the dialogue factory class in the `web.xml`:
+
+!inline src/main/webapp/WEB-INF/web.xml 19-22
+
+You can try it with the following URI:
+
+- [http://localhost:8080/rivr-cookbook/dialogue?dialogue=x](http://localhost:8080/rivr-cookbook/dialogue?dialogue=x)
+- [http://localhost:8080/rivr-cookbook/dialogue?dialogue=y](http://localhost:8080/rivr-cookbook/dialogue?dialogue=y)
+
 
 # Other recipes
 
