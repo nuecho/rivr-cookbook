@@ -344,6 +344,8 @@ public class WikiDocProcessor {
                 if (length < minIndent) {
                     minIndent = length;
                 }
+            } else if (line.trim().length() > 0) {
+                minIndent = 0;
             }
         }
 
