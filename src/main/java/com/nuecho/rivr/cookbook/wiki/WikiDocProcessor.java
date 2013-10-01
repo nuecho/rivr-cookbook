@@ -264,17 +264,25 @@ public class WikiDocProcessor {
         tableOfContentsWriter.close();
     }
 
-    private static void writeTableOfContents(Map<String, Map<String, List<String>>> tableOfContents,
-                                             PrintWriter tableOfContentsWriter) {
+    private static void writeTableOfContents(Map<String, Map<String, List<String>>> tableOfContents, PrintWriter writer) {
+
+        writer.println("<center>");
+        writer.println("![Rivr logo](http://rivr.nuecho.com/img/logo.png)");
+        writer.println();
+        writer.println("# Cookbook");
+        writer.println("_A collection a various recipes explaining how to achieve various tasks with Rvir_");
+        writer.println();
+        writer.println("</center>");
+
         for (Entry<String, Map<String, List<String>>> entry : tableOfContents.entrySet()) {
             String section1Name = entry.getKey();
-            tableOfContentsWriter.println();
-            tableOfContentsWriter.println("1. " + section1Name);
-            tableOfContentsWriter.println();
+            writer.println();
+            writer.println("1. " + section1Name);
+            writer.println();
             for (Entry<String, List<String>> section2Entry : entry.getValue().entrySet()) {
-                tableOfContentsWriter.println("    1. " + section2Entry.getKey());
+                writer.println("    1. " + section2Entry.getKey());
                 for (String section3Name : section2Entry.getValue()) {
-                    tableOfContentsWriter.println("        1. [[" + section3Name + "]]");
+                    writer.println("        1. [[" + section3Name + "]]");
                 }
             }
         }
