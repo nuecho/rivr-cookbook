@@ -262,10 +262,72 @@ The InputTurn contains a `recognitionInfo` property which gives us acces to the 
 
 ### Speech recognition options
 
-!branch speech-options
+!set branch speech-options
+
+This example shows how to tune speech recognition. The parameters describe here are explained in detail in the VoiceXML specification, 
+[Section 6.3.2](http://www.w3.org/TR/voicexml20/#dml6.3.2) and part of [Section 6.3.6](http://www.w3.org/TR/voicexml20/#dml6.3.6)
+
+Setting the confidence level, i.e. the minimum confidence level the result must have in order for the recognition not to throw a `nomatch` event:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60
 
+Setting the right confidence level is very difficult.  If you put this value too high, you will create no-matches for utterances that could have 
+been correct.  On the other hand, setting a value too low will accept incorrect results which should have been discarded.  One way to set this
+value correctly is to perform various benchmarks on the recognition engine using the same grammar and a representative sample. 
+
+Setting the maximum number of hypotheses (a.k.a. _N-Best_) that should be returned by the recognition engine:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61
+
+Getting several hypotheses allows you to inspect the result and propose the other hypotheses during a confirmation dialogue.   However, 
+for UI design reasons, you should limit those confirmations to a reasonable number.  Also, asking many recognition 
+results is more CPU-demanding for the recognition engine (depends on the grammar used).  
+
+Setting the incomplete time-out, i.e. maximum silence duration after end of speech:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
+
+You may want to set this value high enough to give the user a chance to make pauses while speaking.  However, if you set this value too high, it will take 
+longer for the engine to end the recognition and return the result.  If you are only asking a yes/no question, this time-out can be short (ie. something around 500 ms). 
+However, if you are asking a credit card number, this should be longer because people will hesitate and will naturally insert pauses between digit groups, so in this case, 
+a 1500 ms value would be a good starting point.
+
+Another time-out applying after end of speech, the _complete timeout_, can be set like this:  
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
+
+While apparently symmetrical to _incomplete timeout_, the _complete timeout_ is a more advanced setting. The purpose of this setting is to allow the engine to 
+to end recognition after a pause (the _complete time-out_) if a complete recognition result is _available_.  If used adequatly, this can increase the responsiveness
+of the recogntion.
+
+*  In the this example, if the user says "one two three four" and then pauses, at this point, the recognition does not have a valid recognition result 
+because we need a minimum a 5 digits.  So the _complete time-out_ does not apply here.  At this point, if the pause is longer than _incomplete time-out_, 
+the recognition will end.
+*  However, if the user says "one two three four five six" and pauses, the recognizer has a valid recognition result (123456 is allowed 
+by the grammar) and the recognition result will end after a pause of _complete time-out_.  You can see here that if the complete time-out is too short, hesitation 
+beyond the 5th digit will cause recognition to end, so you need to consider this while establishing the value. 
+
+The _maximum speech timeout_ is the maximum time allowed for speaking.  This value should be greater than the time it reasonnably takes for someone to say a valid answer:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
+
+If the user speak beyond this duration, the _maxspeechtimeout_ event is triggered.
+
+The _sensitivity_ parameter allows the tuning of the speech detector for barge-in prompts:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 65-65
+
+A value towards 0 will make it harder to barge-in and a value towards 1 will trigger the barge-in for 
+non-vocal sounds (e.g. clicks, background noise). Unless we have an unusual context, we don't tune this parameter.
+
+The _speed versus accuraccy_ parameter controls the balance beetween speed of speech recognition and accuracy of recogntion results:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-66
+
+A value towards 0 will make the recognition fast but less accurate.  A value towards 1 will make the speech recogntion longer 
+(using more CPU) but more accurate. 
+
+All the value passed to those method can also be `null`, meaning that the platform default should be used. 
 
 ## Call transfers
 
@@ -292,6 +354,10 @@ Then, we check the status code:
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-49
 
 # Integration
+
+## JUnit
+
+### Simple dialogue tests
 
 ## Server-side integration
 
