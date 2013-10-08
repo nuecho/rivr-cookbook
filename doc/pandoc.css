@@ -1,0 +1,130 @@
+body {
+	background-image: url("http://rivr.nuecho.com/img/logo.png");
+	background-repeat: no-repeat;
+	background-position: top center;
+	margin: auto;
+	margin-top: 100px;
+	padding-right: 1em;
+	padding-left: 1em;
+	width: 980px;
+	font-family: Helvetica, Sans, Arial;
+	font-size: 15px;
+	line-height: 1.7;
+	color: #333;
+	margin-top: 100px;
+}
+
+pre {
+	border: 1px dotted gray;
+	background-color: #ececec;
+	color: #1111111;
+	padding: 0.5em;
+}
+
+a {
+	color: #4183c4;
+	text-decoration: none;
+}
+
+a :HOVER {
+	text-decoration: underline;
+}
+
+code {
+	font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+p code {
+	background-color: #f8f8f8;
+	border-radius: 3px;
+	border: solid #ddd 1px;
+	padding: 0 5px;
+}
+
+td.lineNumbers pre {
+	background: none;
+	border: none;
+	line-height: 19px;
+	font-size: 13px;
+}
+
+table.sourceCode {
+	overflow: auto;
+	display: table;
+}
+
+td.sourceCode pre {
+	background-color: #f0f0f0;
+	border-radius: 3px;
+	border: solid #ccc 1px;
+	padding: 6px 10px;
+	font-size: 13px;
+	line-height: 19px;
+
+	width: 960px;
+	overflow: auto;
+}
+
+h1 a,h2 a,h3 a,h4 a,h5 a {
+	text-decoration: none;
+	color: black;
+}
+
+h1,h2,h3,h4,h5 {
+	font-family: Helvetica, Sans, Arial;
+	font-weight: bold;
+	border-bottom: 1px solid black;
+	color: black;
+}
+
+h1 {
+/* 	font-size: 150%; */
+}
+
+h2 {
+/* 	font-size: 120%; */
+}
+
+h3 {
+	font-size: 95%;
+}
+
+h4 {
+	font-size: 90%;
+	font-style: italic;
+}
+
+h5 {
+	font-size: 90%;
+	font-style: italic;
+}
+
+h1.title {
+	font-size: 200%;
+	font-weight: bold;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	text-align: left;
+	border: none;
+}
+
+dt code {
+	font-weight: bold;
+}
+
+blockquote {
+	border-left: 6px solid #ddd;
+	padding: 0px 10px;
+	margin: 0px;
+}
+
+dd p {
+	margin-top: 0;
+}
+
+#footer {
+	padding-top: 1em;
+	font-size: 70%;
+	color: gray;
+	text-align: center;
+}
