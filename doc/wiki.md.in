@@ -359,6 +359,129 @@ Then, we check the status code:
 
 ### Simple dialogue tests
 
+Unit testing is one of Rivr most notable feature. It allows the developper to perform non-regression testing with automated tools.  Using this technique, you can 
+simulate hundreds of call in seconds.
+
+!set branch junit-dialogue-test
+
+Suppose we have a simple dialogue and we want to write unit test for it:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 25-74
+
+We first need to write a unit test class in which we will initialize a `VoiceXmlTestDialogueChannel` which is an implementation
+of `DialogueChannel` used for testing.  This implementation allows us to simulate responses from the VoiceXML platform such as recognition results and no-match events. 
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 29-31
+
+This dialogue channel must be set in the dialogue context we will use in our test cases: 
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 32-36
+
+The rest of the class is a mix of test methods (annotated with `@org.junit.Test` annotation) and helper methods.
+
+Let's take a look at our first test case:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 38-54
+
+The first thing to do is (obviously!) to start the dialogue.  
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 40-40
+
+We have used the `startDialogue()` helper method to do so:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 134-136
+
+We then need to perform some kind of check to validate that the dialogue is executing correctly.  We know that the first thing the 
+dialogue should do is to play the welcome message, so let's verify that:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 41-41
+
+Since other test cases also require to perform this check, we have extracted the logic in
+the `assertWelcomeMessage()` helper method:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 138-140
+
+The `assertMessage()` method ensure that the dialogue is generating a `MessageTurn` and that the audio items are as expected:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 154-159
+
+Note that in this method, we use the `getLastStepAsOutputTurn()` method on our test dialogue channel to query the last _step_ that 
+occured in the channel.  The step can be one of:
+
+* Output turn
+* Last turn
+* Error
+
+Depending on the expected type of step at this point in the dialogue, we can invoke respectively 
+
+* `mChannel.getLastStepAsOutputTurn()`
+* `mChannel.getLastStepAsLastTurn()`
+* `mChannel.getLastStepAsError()`
+
+So the `assertMessage()` method will ensure 
+
+1. that we have, at this point in the dialogue, an `OutputTurn` for which the type is `MessageTurn`
+2. that the audio items of this message turn are as expected
+
+Note that we are only asserting some aspects of the `MessageTurn`.  We didn't test neither the `language` nor `barge-in` properties.  
+Thus it's possible to make the test cases as sophisticated as needed.  There's always a trade-off between what is actually asserted in 
+unit tests and the effort required to develop those test cases.  You have control over what you depth of assertion for each turn.
+
+Geting back at our example, now we'll simulate the VoiceXML platform response.  In this case, since we have a message, the only possible response 
+from the platform (beside an `error` event) is what we call a _no-action_, i.e. an input turn without any property set.  In order to simulate this platform response, we invoke the 
+`processNoAction()` method on the dialogue channel:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 43-43
+
+The dialogue will then progress to the next turn.
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 44-44
+
+The `assertPromptForNumber()` validates that we have an interaction turn, parameterized for DTMF recogition and having some specific messages:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 142-144 
+
+This method uses two additionnal helper methods `assertDtmfInteraction` and `assertInteraction`:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 161-175
+
+Again, we see that we can build many reusable helper methods that will make each test case very terse.
+
+To simulate DTMF processing, including semantic result, we do:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 46-46
+  
+The first argument is the raw input (DTMF recognizer will sometime separate digits with spaces), the second one is the semantic result, the third one is a mark 
+info (not covered here). Next step is to validate the feedback message:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 47-47
+
+At this point, you may have noticed that we have always follow this pattern:
+
+* perform some action
+* assert something
+
+Using a white line between each block will help you remain organized in you test case method code.
+
+To assert the result of the dialogue, we only need to assert the `LastTurn`:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 50-53
+
+With `assertExit()` defined as:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 177-183
+
+If we only run JUnit for the test case `testNormal()` we do not completely every outcome of the callflow.  This can be verified by running JUnit in conjunction 
+with a coverage tool.  I will be using [Emma](http://emma.sourceforge.net/) with the [Eclipse plug-in](http://www.eclemma.org/):
+ 
+![Emma code coverage in Eclipse](http://nuecho.github.io/rivr/cookbook-resources/eclipse-coverage-1.png "Emma code coverage in Eclipse")
+ 
+Adding 3 other test cases, we can achieve complete coverage:
+
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 56-132
+ 
+![Emma code coverage in Eclipse](http://nuecho.github.io/rivr/cookbook-resources/eclipse-coverage-2.png "Emma code coverage in Eclipse")
+
 ## Server-side integration
 
 ### Spring framework integration
