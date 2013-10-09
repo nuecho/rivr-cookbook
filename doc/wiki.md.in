@@ -363,6 +363,46 @@ Then, we check the status code:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-49
 
+# Using vendor-specific VoiceXML platform extensions
+
+## Genesys Voice Platform 8 (GVP 8)
+
+### Obtaining UUID
+
+!set branch genesys-gvp-uuid
+
+GVP Call UUID is exposed under `session.connection.uuid`.  We use a `ScriptExecutionTurn` to retrieve it:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 20-36
+
+### Obtaining GVP session ID
+
+!set branch genesys-gvp-session-id
+
+GVP Session ID is exposed under `session.com.genesyslab.sessionid`.  We use a `ScriptExecutionTurn` to retrieve it:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 20-36
+
+### Reading user data
+
+!set branch genesys-gvp-read-user-data
+
+This example assumes a SIP Server integration (not the CTI connector).
+
+This example shows how to extract user data sent by the SIP Server at the beggining of the call.  The SIP server sends the user 
+data in specific headers of the SIP INVITE message, typically the ones prefixed with `X-Genesys-`:
+
+    X-Genesys-CustomerName: Peter Johnson
+    X-Genesys-AccountNumber: 55534-53124-67110
+
+GVP will map these headers to the `session.com.genesyslab.userdata` object, making it available to the VoiceXML application. We only
+need to use a `ScriptExecutionTurn` to retrieve it: 
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 22-43
+
+Note that if user data are updated during the GVP call, the updated data cannot be read from the VoiceXML because it's only passed from
+SIP Server to GVP in the SIP INVITE _at the beggining of the call_. 
+
 # Integration
 
 ## JUnit
@@ -533,7 +573,6 @@ You can try it with the following URI:
 
 - [http://localhost:8080/rivr-cookbook/dialogue?dialogue=x](http://localhost:8080/rivr-cookbook/dialogue?dialogue=x)
 - [http://localhost:8080/rivr-cookbook/dialogue?dialogue=y](http://localhost:8080/rivr-cookbook/dialogue?dialogue=y)
-
 
 # Other recipes
 
