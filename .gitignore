@@ -3,7 +3,6 @@ build/
 .classpath
 .project
 **/.settings/gradle
-org.eclipse.jdt.core.prefs
 org.eclipse.jdt.groovy.core.prefs
 .settings/gradle
 org.springsource.ide.eclipse.gradle.core.prefs
