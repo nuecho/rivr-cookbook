@@ -22,7 +22,7 @@ eclipse {
 }
 
 dependencies {
-    compile 'com.nuecho:rivr-voicexml:0.9.2'
+    compile 'com.nuecho:rivr-voicexml:+'
     compile 'log4j:log4j:1.2.16'
     providedCompile 'javax.servlet:servlet-api:2.5'
     runtime 'org.slf4j:slf4j-log4j12:1.7.0'
