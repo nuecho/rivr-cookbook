@@ -7,6 +7,12 @@
 
 !set branch hello-world
 
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 17-28
+
+### Hello World 2
+
+!set branch hello-world-2
+
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 27-66
 
 # Output Turns
@@ -35,7 +41,7 @@
 
 !set branch message-ssml
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-42
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-48
 
 ### Playing mutiple audio items
 
@@ -167,7 +173,7 @@ of the input mode (i.e. DTMF or speech), making it easier to process in the dial
  
 Here's the phone number grammar modified with semantic tags:
  
-!inline src/main/webapp/grammars/phone-number.grxml 9-42
+!inline src/main/webapp/grammars/phone-number.grxml 12-45
 
 Here's how to access the result:
 
