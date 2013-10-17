@@ -15,7 +15,7 @@ public class Dialogue implements VoiceXmlDialogue {
     public VoiceXmlLastTurn run(VoiceXmlFirstTurn firstTurn, VoiceXmlDialogueContext context) throws Exception {
 
         //end of dialogue
-        return new VoiceXmlExitTurn("exit");
+        return new Exit("exit");
     }
 
 }
