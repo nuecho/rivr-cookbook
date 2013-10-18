@@ -486,7 +486,7 @@ data in specific headers of the SIP INVITE message, typically the ones prefixed 
 GVP will map these headers to the `session.com.genesyslab.userdata` object, making it available to the VoiceXML application. We only
 need to use a `ScriptExecutionTurn` to retrieve it:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 22-44
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 22-49
 
 Note that if user data are updated during the GVP call, the updated data cannot be read from the VoiceXML because it's only passed from
 SIP Server to GVP in the SIP INVITE _at the beggining of the call_.
