@@ -17,7 +17,7 @@
 
 # Output Turns
 
-## Messages 
+## Messages
 
 ### Playing speech synthesis
 
@@ -72,10 +72,10 @@ This can also be done globally at the VoiceXML level:
 !set branch message-barge-in
 
 First, we need to disable to fetchaudio property.  Maybe the platform default is already empty, but to make sure:
- 
+
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-35
 
-Then, we can queue the message with the barge-in flag set.  
+Then, we can queue the message with the barge-in flag set.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-44
 
@@ -92,7 +92,7 @@ the user can press a digit during the message and the interaction will complete.
 
 This example shows how to collect a DTMF string from the caller.  It involves the `InteractionTurn` which is created with the `InteractionBuilder`.
 
-The first thing we need to do is to create the `DtmfRecognitionConfiguration`.  This object contains the DTMF grammar used for DTMF recognition.  
+The first thing we need to do is to create the `DtmfRecognitionConfiguration`.  This object contains the DTMF grammar used for DTMF recognition.
 There are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification.  We are going to use `digits`.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 58-60
@@ -101,9 +101,9 @@ Then we need to build the interaction.  We are going to instanciate an `Interact
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
-Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method.  Here we just use a SynthesisText message. 
+Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method.  Here we just use a SynthesisText message.
 
-To create the InteractionTurn itself, we invoke the `build()` method and we pass the `DtmfRecogntionConfiguration` object, meaning that we want to 
+To create the InteractionTurn itself, we invoke the `build()` method and we pass the `DtmfRecogntionConfiguration` object, meaning that we want to
 perform DTMF recognition immediately after prompts are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raised.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-64
@@ -116,9 +116,9 @@ We now need to inspect the result in order to know what has been done by the use
 
 1. The user has typed a number
 2. The user didn't enter anything
-  
+
 Actually, other outcomes are possible (e.g. hang-up, error) but we'll ignore that for now for the sake of simplicity.
-The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.  
+The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 68-76
 
@@ -133,7 +133,7 @@ In order to do that, we use a diffent signature of the `addPrompt` method.  We u
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-65
 
 The `DtmfRecognitionConfiguration` object is used twice in this statement.  It is important to understand why:
- 
+
 1. The fact that we specify a `DtmfRecognitionConfiguration` _in the `addPrompt()` method_ indicates that the user can perform input _while the prompt is playing_.
 2. The fact that we specify a `DtmfRecognitionConfiguration` _in the `build()` method_ indicates that the user can also perform input _after the prompts are played_.
 
@@ -144,7 +144,7 @@ The `DtmfRecognitionConfiguration` object is used twice in this statement.  It i
 This example shows how to use a DTMF grammar to define what should be accepted during DTMF recognition.
 
 Here a grammar that will accept all North-American valid phone number:
- 
+
 !inline src/main/webapp/grammars/phone-number.grxml
 
 Here's how this should be use in the dialogue:
@@ -152,7 +152,7 @@ Here's how this should be use in the dialogue:
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 58-67
 
 Since the grammar is very simple and it doesn't provide semantic interpration, the result can be obtain
-by getting the _utterance_ property of the recognition result. 
+by getting the _utterance_ property of the recognition result.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 69-79
 
@@ -161,18 +161,18 @@ by getting the _utterance_ property of the recognition result.
 !set branch dtmf-grammar-with-semantic
 
 In the other DTMF recognition examples where a built-in grammar was used, we have rather used the _interpretation_ property of the
-recognition result because built-in grammars provide a _semantic interpretation_.  It is better to work with the interpretation than the raw utterance.  
+recognition result because built-in grammars provide a _semantic interpretation_.  It is better to work with the interpretation than the raw utterance.
 
-In our previous example ([[Using a DTMF grammar]]), the optional "1" will be part of the result if the caller  has pressed the key, so we must deal with the fact that
-it may be present or not.  In other word, we need to do the normalization in the dialogue.   It's also possible that DTMF _utterance_ will
-contains space between each digits (i.e. `5 1 4 5 5 5 1 2 3 4`), so there is another normalization to do there also.  
+In our previous example ([[Using a DTMF grammar]]), the optional "1" will be part of the result if the caller has pressed the key, so we must deal with the fact that
+it may be present or not.  In other word, we need to do the normalization in the dialogue.  It's also possible that DTMF _utterance_ will
+contains space between each digits (i.e. `5 1 4 5 5 5 1 2 3 4`), so there is another normalization to do there also.
 
 If the grammar provides semantic tags, you have control over what is returned in the recognition result.
-Moreover, if you are performing speech recognition and DTMF recognition at once, you can return the same format for the interpretation regardless 
+Moreover, if you are performing speech recognition and DTMF recognition at once, you can return the same format for the interpretation regardless
 of the input mode (i.e. DTMF or speech), making it easier to process in the dialog.
- 
+
 Here's the phone number grammar modified with semantic tags:
- 
+
 !inline src/main/webapp/grammars/phone-number.grxml 12-45
 
 Here's how to access the result:
@@ -185,30 +185,30 @@ Note that the phone number doesn't need any normalization at this point.  The op
 
 !set branch dtmf-options
 
-This example shows how to tune DTMF recognition.  The parameters describe here are explained in detail in the VoiceXML specification, 
+This example shows how to tune DTMF recognition.  The parameters describe here are explained in detail in the VoiceXML specification,
 [Section 6.3.3](http://www.w3.org/TR/voicexml20/#dml6.3.3) and [Appendix D - Timing Properties / DTMF Grammar](http://www.w3.org/TR/voicexml20/#L9212)
 
 Let's start by having a grammar accepting a DTMF string between 5 and 10 digits long.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 58-60
 
-Now let's configure the _inter-digit time-out_, i.e. the maximum pause duration between the input of two consecutive digits before the input is considered finished. 
+Now let's configure the _inter-digit time-out_, i.e. the maximum pause duration between the input of two consecutive digits before the input is considered finished.
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61 
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61
 
-Another option you can configure is the DTMF _term char_, i.e. the DMTF key the caller can press in order to terminate the input.  
-This is the DTMF equivalent of the _Enter_ key.  So the user can press the DTMF _term char_ once the input is done, 
-not having to wait for the _inter-digit time-out_.  
+Another option you can configure is the DTMF _term char_, i.e. the DMTF key the caller can press in order to terminate the input.
+This is the DTMF equivalent of the _Enter_ key.  So the user can press the DTMF _term char_ once the input is done,
+not having to wait for the _inter-digit time-out_.
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62 
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
 The last parameter is _term time-out_, i.e. the time given to enter the term char once
-when no other character can be accepted (in our exemple, after the 10th digit).  The idea is to put a value 
-for _term time-out_ that is shorter than _inter-digit time-out_ value.  
+when no other character can be accepted (in our exemple, after the 10th digit).  The idea is to put a value
+for _term time-out_ that is shorter than _inter-digit time-out_ value.
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63 
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
 
-The `DtmfRecognitionConfiguration` can now be used to build the `InteractionTurn`. 
+The `DtmfRecognitionConfiguration` can now be used to build the `InteractionTurn`.
 Note that the time-out specify here (2 seconds) is the _no-input time-out_ (or simply _timeout_ in the VoiceXML terminology):
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 65-68
@@ -223,15 +223,15 @@ You can then perform the DTMF recognition by executing the turn:
 
 Sometime, it is required to play a message while giving the caller a way to interrupt it and skip the rest of it.  The following example explains how to do that.
 
-First, we need to specify a DTMF grammar accepting a single digit: 
+First, we need to specify a DTMF grammar accepting a single digit:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 55-57
 
-We also reset the DTMF termination character as we want to make the pound key (#) a DTMF input. 
+We also reset the DTMF termination character as we want to make the pound key (#) a DTMF input.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 58-58
 
-Then we create the interaction using the `InteractionBuilder` and we only set the `DtmfRecognitionConfiguration` for the prompt.  
+Then we create the interaction using the `InteractionBuilder` and we only set the `DtmfRecognitionConfiguration` for the prompt.
 There is no parameter in the `build()` method since we do not want to perform recognition once the message is played.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-66
@@ -255,9 +255,9 @@ Then we need to build the interaction.  We are going to instanciate an `Interact
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
-Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method.  Here we just use a SynthesisText message. 
+Then we need to specify the prompts that we are going to use.  This is done with the `addPrompt()` method.  Here we just use a SynthesisText message.
 
-To create the InteractionTurn itself, we invoke the `build()` method and we pass the `SpeechRecogntionConfiguration` object, meaning that we want to 
+To create the InteractionTurn itself, we invoke the `build()` method and we pass the `SpeechRecogntionConfiguration` object, meaning that we want to
 perform speech recognition immediately after prompts are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-64
@@ -271,9 +271,9 @@ We now need to inspect the result in order to know what has been done by the use
 1. The user said some digits
 2. The user said something that could not be understood
 3. The user didn't say anything
-  
+
 Actually, other outcomes are possible (e.g. hang-up, error) but we'll ignore that for now for the sake of simplicity.
-The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.  
+The InputTurn contains a `recognitionInfo` property which gives us acces to the recognition result.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 68-78
 
@@ -281,48 +281,48 @@ The InputTurn contains a `recognitionInfo` property which gives us acces to the 
 
 !set branch speech-options
 
-This example shows how to tune speech recognition.  The parameters describe here are explained in detail in the VoiceXML specification, 
+This example shows how to tune speech recognition.  The parameters describe here are explained in detail in the VoiceXML specification,
 [Section 6.3.2](http://www.w3.org/TR/voicexml20/#dml6.3.2) and part of [Section 6.3.6](http://www.w3.org/TR/voicexml20/#dml6.3.6)
 
 Setting the confidence level, i.e. the minimum confidence level the result must have in order for the recognition not to throw a `nomatch` event:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
-Setting the right confidence level is very difficult.  If you put this value too high, you will create no-matches for utterances that could have 
+Setting the right confidence level is very difficult.  If you put this value too high, you will create no-matches for utterances that could have
 been correct.  On the other hand, setting a value too low will accept incorrect results which should have been discarded.  One way to set this
-value correctly is to perform various benchmarks on the recognition engine using the same grammar and a representative sample. 
+value correctly is to perform various benchmarks on the recognition engine using the same grammar and a representative sample.
 
 Setting the maximum number of hypotheses (a.k.a. _N-Best_) that should be returned by the recognition engine:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
 
-Getting several hypotheses allows you to inspect the result and propose the other hypotheses during a confirmation dialogue.   However, 
+Getting several hypotheses allows you to inspect the result and propose the other hypotheses during a confirmation dialogue.  However,
 for UI design reasons, you should limit those confirmations to a reasonable number.  Also, asking many hypotheses is more CPU-demanding for
-the recognition engine (depends on the grammar used).  
+the recognition engine (depends on the grammar used).
 
 Setting the incomplete time-out, i.e. maximum silence duration after end of speech:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
 
-You may want to set this value high enough to give the user a chance to make pauses while speaking.  However, if you set this value too high, it will take 
-longer for the engine to end the recognition and return the result.  If you are only asking a yes/no question, this time-out can be short (ie. something around 500 ms). 
-However, if you are asking a credit card number, this should be longer because people will hesitate and will naturally insert pauses between digit groups, so in this case, 
+You may want to set this value high enough to give the user a chance to make pauses while speaking.  However, if you set this value too high, it will take
+longer for the engine to end the recognition and return the result.  If you are only asking a yes/no question, this time-out can be short (ie. something around 500 ms).
+However, if you are asking a credit card number, this should be longer because people will hesitate and will naturally insert pauses between digit groups, so in this case,
 a 1500 ms value would be a good starting point.
 
-Another time-out applying after end of speech, the _complete timeout_, can be set like this:  
+Another time-out applying after end of speech, the _complete timeout_, can be set like this:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 65-65
 
-While apparently symmetrical to _incomplete timeout_, the _complete timeout_ is a more advanced setting.  The purpose of this setting is to allow the engine to 
+While apparently symmetrical to _incomplete timeout_, the _complete timeout_ is a more advanced setting.  The purpose of this setting is to allow the engine to
 end recognition after a pause (the _complete time-out_) if a complete recognition result is _available_.  If used adequatly, this can increase the responsiveness
 of the recogntion.
 
-*  In this example, if the user says "one two three four" and then pauses, the recognizer does not have a valid recognition result yet 
-because a minimum of 5 digits is required.  So the _complete time-out_ does not apply here.  At this point, if the pause is longer than _incomplete time-out_, 
+* In this example, if the user says "one two three four" and then pauses, the recognizer does not have a valid recognition result yet
+because a minimum of 5 digits is required.  So the _complete time-out_ does not apply here.  At this point, if the pause is longer than _incomplete time-out_,
 the recognition will end.
-*  However, if the user says "one two three four five six" and pauses, the recognizer has a valid recognition result (123456 is allowed 
-by the grammar) and the recognition result will end after a pause of _complete time-out_.  You can see here that if the complete time-out is too short, hesitation 
-beyond the 5th digit will cause recognition to end, so you need to consider this while establishing the value. 
+* However, if the user says "one two three four five six" and pauses, the recognizer has a valid recognition result (123456 is allowed
+by the grammar) and the recognition result will end after a pause of _complete time-out_.  You can see here that if the complete time-out is too short, hesitation
+beyond the 5th digit will cause recognition to end, so you need to consider this while establishing the value.
 
 The _maximum speech timeout_ is the maximum time allowed for speaking.  This value should be greater than the time it reasonnably takes for someone to say a valid answer:
 
@@ -334,17 +334,18 @@ The _sensitivity_ parameter allows the tuning of the speech detector for barge-i
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 67-67
 
-A value towards 0 will make it harder to barge-in and a value towards 1 will trigger the barge-in for 
+A value towards 0 will make it harder to barge-in and a value towards 1 will trigger the barge-in for
 non-vocal sounds (e.g. clicks, background noise).  Normally, we don't tune this parameter unless the context is unusual.
 
 The _speed versus accuraccy_ parameter controls the balance beetween speed of speech recognition and accuracy of recogntion results:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 68-68
 
-A value towards 0 will make the recognition fast but less accurate.  A value towards 1 will make the speech recogntion longer 
-(using more CPU) but more accurate. 
+A value towards 0 will make the recognition fast but less accurate.  A value towards 1 will make the speech recogntion longer
+(using more CPU) but more accurate.
 
-All the values passed to those methods can also be `null`, meaning that the platform default should be used. 
+All the values passed to those methods can also be `null`, meaning that the platform default should be used.
+
 
 ## Call transfers
 
@@ -396,19 +397,19 @@ GVP Session ID is exposed under `session.com.genesyslab.sessionid`.  We use a `S
 
 This example assumes a SIP Server integration (not the CTI connector).
 
-This example shows how to extract user data sent by the SIP Server at the beggining of the call.  The SIP server sends the user 
+This example shows how to extract user data sent by the SIP Server at the beggining of the call.  The SIP server sends the user
 data in specific headers of the SIP INVITE message, typically the ones prefixed with `X-Genesys-`:
 
     X-Genesys-CustomerName: Peter Johnson
     X-Genesys-AccountNumber: 55534-53124-67110
 
 GVP will map these headers to the `session.com.genesyslab.userdata` object, making it available to the VoiceXML application. We only
-need to use a `ScriptExecutionTurn` to retrieve it: 
+need to use a `ScriptExecutionTurn` to retrieve it:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 22-44
 
 Note that if user data are updated during the GVP call, the updated data cannot be read from the VoiceXML because it's only passed from
-SIP Server to GVP in the SIP INVITE _at the beggining of the call_. 
+SIP Server to GVP in the SIP INVITE _at the beggining of the call_.
 
 # Integration
 
@@ -416,7 +417,7 @@ SIP Server to GVP in the SIP INVITE _at the beggining of the call_.
 
 ### Simple dialogue tests
 
-Unit testing is one of Rivr most notable feature. It allows the developer to perform non-regression testing with automated tools.  Using this technique, you can 
+Unit testing is one of Rivr most notable feature. It allows the developer to perform non-regression testing with automated tools.  Using this technique, you can
 simulate hundreds of call in seconds.
 
 !set branch junit-dialogue-test
@@ -426,11 +427,11 @@ Suppose we have a simple dialogue and we want to write unit tests for it:
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 27-77
 
 We first need to write a unit test class in which we will initialize a `VoiceXmlTestDialogueChannel` which is an implementation
-of `DialogueChannel` used for testing.  This implementation allows us to simulate responses from the VoiceXML platform such as recognition results and no-match events. 
+of `DialogueChannel` used for testing.  This implementation allows us to simulate responses from the VoiceXML platform such as recognition results and no-match events.
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 30-33
 
-This dialogue channel must be set in the dialogue context we will use in our test cases: 
+This dialogue channel must be set in the dialogue context we will use in our test cases:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 35-40
 
@@ -440,7 +441,7 @@ Let's take a look at our first test case:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 42-58
 
-The first thing to do is (obviously!) to start the dialogue.  
+The first thing to do is (obviously!) to start the dialogue.
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 44-44
 
@@ -448,7 +449,7 @@ We have used the `startDialogue()` helper method to do so:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 138-140
 
-We then need to perform some kind of check to validate that the dialogue is executing correctly.  We know that the first thing the 
+We then need to perform some kind of check to validate that the dialogue is executing correctly.  We know that the first thing the
 dialogue should do is to play the welcome message, so let's verify that:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 45-45
@@ -462,30 +463,30 @@ The `assertMessage()` method ensure that the dialogue is generating a `MessageTu
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 159-164
 
-Note that in this method, we use the `getLastStepAsOutputTurn()` method on our test dialogue channel to query the last _step_ that 
+Note that in this method, we use the `getLastStepAsOutputTurn()` method on our test dialogue channel to query the last _step_ that
 occured in the channel.  The step can be one of:
 
 * Output turn
 * Last turn
 * Error
 
-Depending on the expected type of step at this point in the dialogue, we can invoke respectively 
+Depending on the expected type of step at this point in the dialogue, we can invoke respectively
 
 * `mChannel.getLastStepAsOutputTurn()`
 * `mChannel.getLastStepAsLastTurn()`
 * `mChannel.getLastStepAsError()`
 
-So the `assertMessage()` method will ensure 
+So the `assertMessage()` method will ensure
 
 1. that we have, at this point in the dialogue, an `OutputTurn` for which the type is `MessageTurn`
 2. that the audio items of this message turn are as expected
 
-Note that we are only asserting some aspects of the `MessageTurn`.  We didn't test neither the `language` nor `barge-in` properties.  
-Thus it's possible to make the test cases as sophisticated as needed.  There's always a trade-off between what is actually asserted in 
+Note that we are only asserting some aspects of the `MessageTurn`.  We didn't test neither the `language` nor `barge-in` properties.
+Thus it's possible to make the test cases as sophisticated as needed.  There's always a trade-off between what is actually asserted in
 unit tests and the effort required to develop those test cases.  You have control over what you depth of assertion for each turn.
 
-Geting back at our example, now we'll simulate the VoiceXML platform response.  In this case, since we have a message, the only possible response 
-from the platform (beside an `error` event) is what we call a _no-action_, i.e. an input turn without any property set.  In order to simulate this platform response, we invoke the 
+Geting back at our example, now we'll simulate the VoiceXML platform response.  In this case, since we have a message, the only possible response
+from the platform (beside an `error` event) is what we call a _no-action_, i.e. an input turn without any property set.  In order to simulate this platform response, we invoke the
 `processNoAction()` method on the dialogue channel:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 47-47
@@ -496,7 +497,7 @@ The dialogue will then progress to the next turn.
 
 The `assertPromptForNumber()` validates that we have an interaction turn, parameterized for DTMF recogition and having some specific messages:
 
-!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 146-150 
+!inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 146-150
 
 This method uses two additionnal helper methods `assertDtmfInteraction` and `assertInteraction`:
 
@@ -507,8 +508,8 @@ Again, we see that we can build many reusable helper methods that will make each
 To simulate DTMF processing, including semantic result, we do:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 50-50
-  
-The first argument is the raw input (DTMF recognizer will sometime separate digits with spaces), the second one is the semantic result, the third one is a mark 
+
+The first argument is the raw input (DTMF recognizer will sometime separate digits with spaces), the second one is the semantic result, the third one is a mark
 info (not covered here). Next step is to validate the feedback message:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 51-51
@@ -528,15 +529,15 @@ With `assertExit()` defined as:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 184-190
 
-If we only run JUnit for the test case `testNormal()` we do not completely every outcome of the callflow.  This can be verified by running JUnit in conjunction 
+If we only run JUnit for the test case `testNormal()` we do not completely every outcome of the callflow.  This can be verified by running JUnit in conjunction
 with a coverage tool.  I will be using [Emma](http://emma.sourceforge.net/) with the [Eclipse plug-in](http://www.eclemma.org/):
- 
+
 ![Emma code coverage in Eclipse](http://nuecho.github.io/rivr/cookbook-resources/eclipse-coverage-1.png "Emma code coverage in Eclipse")
- 
+
 Adding 3 other test cases, we can achieve complete coverage:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 60-136
- 
+
 ![Emma code coverage in Eclipse](http://nuecho.github.io/rivr/cookbook-resources/eclipse-coverage-2.png "Emma code coverage in Eclipse")
 
 ## Server-side integration
@@ -545,14 +546,14 @@ Adding 3 other test cases, we can achieve complete coverage:
 
 !set branch spring
 
-There are so many ways you can leverage the [Spring framework](http://projects.spring.io/spring-framework/). 
-This example will show you how to provide a custom dialogue factory that will create VoiceXmlDialogue objects 
+There are so many ways you can leverage the [Spring framework](http://projects.spring.io/spring-framework/).
+This example will show you how to provide a custom dialogue factory that will create VoiceXmlDialogue objects
 from the Spring bean factory.
 
 The first step is to create a Dialogue as a Java bean:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 15-39
- 
+
 Note that this dialogue has a mandatory _message_ property.
 
 Now in the bean factory configuration file, we can provide some definitions for some _dialogue beans_:
@@ -560,14 +561,14 @@ Now in the bean factory configuration file, we can provide some definitions for 
 !inline src/main/webapp/WEB-INF/applicationContext.xml
 
 We make those beans as _prototype_, meaning that they are reinstanciated each time they are requested.  This is required
-if the dialogue class is stateful (which is not really the case in our example).  A stateless dialogue bean can be 
+if the dialogue class is stateful (which is not really the case in our example).  A stateless dialogue bean can be
 shared across many "phone calls" while a stateful dialogue bean can only used by one call.
 
 You need to set the application context in the web.xml:
 
 !inline src/main/webapp/WEB-INF/web.xml 11-13
 
-We can define a custom dialogue factory that will lookup the dialogue in the bean factory according to 
+We can define a custom dialogue factory that will lookup the dialogue in the bean factory according to
 the value of the `dialogue` HTTP parameter:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/DialogueFactory.java 21-56
@@ -589,7 +590,7 @@ You can try it with the following URI:
 
 !set branch clid-dnis
 
-This example shows how to get the CLID (also known as ANI) and DNIS from the VoiceXML platform.  To do that, we need to read two read-only 
+This example shows how to get the CLID (also known as ANI) and DNIS from the VoiceXML platform.  To do that, we need to read two read-only
 [variables specified by the VoiceXML specification](http://www.w3.org/TR/voicexml20/#dml5.1.4):
 
 > `session.connection.local.uri`
@@ -604,9 +605,9 @@ To create a VoiceXML document reading platform variables, we use the `ScriptExec
 
 1. Initialize some variables with some optional expression.
 2. Execute an optional script
-3. Send back the variables to the server 
+3. Send back the variables to the server
 
-Here, we will only need to initialize two variables and send the result back to our dialogue, no need for a script here as initial value assignment is enough.  
+Here, we will only need to initialize two variables and send the result back to our dialogue, no need for a script here as initial value assignment is enough.
 To define the variables and initial expression, we use the `VariableDeclarationList` class:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 24-26
@@ -623,5 +624,5 @@ To retrieve the result, we cast the `inputTurn.getValue()` into a `JsonObject`. 
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-36
 
-Note that the CLID and DNIS obtained this way are URI.  If you have a SIP IVR platform integrated with the PSTN, you are likely to get SIP URI (e.g. `sip:+15145551234@proxy.example.com`) so you probably need to do 
+Note that the CLID and DNIS obtained this way are URI.  If you have a SIP IVR platform integrated with the PSTN, you are likely to get SIP URI (e.g. `sip:+15145551234@proxy.example.com`) so you probably need to do
 some parsing in order to extract the numeric value of the SIP URI.
