@@ -346,12 +346,92 @@ A value towards 0 will make the recognition fast but less accurate.  A value tow
 
 All the values passed to those methods can also be `null`, meaning that the platform default should be used.
 
+### Recording
+
+!set branch simple-recording
+
+This example shows how to record a message from the caller.
+
+First, a `RecordingConfiguration` object must be created:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 57-57
+
+This object allows us to define the recording behaviour.  The `beep` property will make the beginning of the recording
+start with a beep:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 58-58
+
+The `postAudioToServer` (defaults to `true`, explicitly set here for the tutorial purpose) instructs the VoiceXML platform
+to send back the audio file of the recording back to the server.  Doing so will allow the dialogue to manipulate the payload of
+the recording (typically: write the audio file on the filesystem):
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 59-59
+
+Note: Sending the audio file to the server is not the only thing you can do with a recirding. The `clientSideAssignationDestination` property can be set in
+order to store the audio file in a VoiceXML variable (i.e. on the platform, the client-side) and be played later in the dialogue using a `ClientSideRecording`
+audio item.
+
+The `type` property sets the audio file format:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60
+
+The `finalSilence` property specifies the silence duration required to stop the recording.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61
+
+If the `dtmfTerm` property is set, the caller can stop the recording by pressing any DTMF key:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
+
+The `maxTime` property limits the duration of the recording:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
+
+Once we have our `RecognitionConfiguration` we can build our interaction turn:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 65-69
+
+The turn is then processed as usual:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 71-71
+
+If the recording succeeded, the `recordingInfo` property will be set in the `InputTurn`:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 74-74
+
+The `RecordingInfo` exposes meta-data of the recording:
+
+* `dtmfTerm`: If the recording ended because the user pressed a DTMF key, this property will contain the latter key.
+* `duration`: This contains the duration of the recording (in milliseconds).
+* `maxTime`: This property is set to `true` is maximum duration is reached.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 75-78
+
+The `RecordingInfo` also contains the recording itself in the `recordingData` property.
+
+* `type`: This property contains the the audio file format (e.g. "audio/x-wav").
+* `audioPayload`: This is the audio file itself, exposed as a `byte[]`.
+* `filename`: This property contains the filename of the recording, as sent by the VoiceXML platform.
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 80-83
+
+We show in this example how to store the file on disk (on the server-side).
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 85-90
+  
+Note that you must also check for the `no-input` event as the user might have remained silence and no message
+has been recorded:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 91-94
+
 
 ## Call transfers
 
 ### Blind Transfer
 
 !set branch transfer-blind
+
+
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 21-29
 
