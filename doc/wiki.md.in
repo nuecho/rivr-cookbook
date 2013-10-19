@@ -369,7 +369,7 @@ the recording (typically: write the audio file on the filesystem):
 
 Note: Sending the audio file to the server is not the only thing you can do with a recirding. The `clientSideAssignationDestination` property can be set in
 order to store the audio file in a VoiceXML variable (i.e. on the platform, the client-side) and be played later in the dialogue using a `ClientSideRecording`
-audio item.
+audio item.  See [[Recording with playback]] for more info.
 
 The `type` property sets the audio file format:
 
@@ -423,6 +423,23 @@ Note that you must also check for the `no-input` event as the user might have re
 has been recorded:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 91-94
+
+### Recording with playback
+
+!set branch recording-to-variable
+
+It is sometime useful to play back the recorded message to the user in order to get a confirmation.  To do that,
+we just need to temporarly store the audio on the VoiceXML platform.  To do that, we do the same thing as in [[Recording]]
+except that we add the following:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61
+
+This will store the recorded audio in a VoiceXML variable in the application 
+scope (we will need it later in the dialogue, that's why we need to put it in the `application` scope).
+
+To play back the message, we need to use the `ClientSideRecording` audio item:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 94-96
 
 
 ## Call transfers
