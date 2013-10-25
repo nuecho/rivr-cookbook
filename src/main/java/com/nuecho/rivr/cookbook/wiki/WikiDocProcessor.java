@@ -286,6 +286,11 @@ public class WikiDocProcessor {
                 }
             }
         }
+
+        writer.println();
+        writer.println("You haven't found your answer here?  Something is not right? Let us know by "
+                       + "[opening an issue](https://github.com/nuecho/rivr-cookbook/issues/new) "
+                       + "and we'll do our best to adjust the recipes or to provide a new one.");
     }
 
     private static String normalizeFileName(String item) {
