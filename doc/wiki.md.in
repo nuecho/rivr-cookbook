@@ -477,24 +477,28 @@ This example shows how to invoke a VoiceXML subdialogue as defined in the
 The output turn required to invoke a subdialogue is a `SubdialogueInvocationTurn`.  We pass the URL of the 
 subdialogue in the constructor:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 25-27
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 25-26
 
 The HTTP request to get the subdialogue will use the POST method:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-29
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 28-28
 
 The turn will be executed:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 31-31
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-30
 
 The subdialogue return values will be placed in the `value` property of the `InputTurn`.  Let's assume here
 that our dialogue returned multiple named values. This will be available in the dialogue as a `JsonObject`:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-35
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 32-34
 
 Each property of the JSON object correspond to the return value:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 37-44
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-43
+
+The sample comes with a sample VoiceXML subdialogue:
+
+!inline src/main/webapp/subdialogue.vxml
 
 ### Invoking a subdialogue and passing HTTP parameters
 
@@ -506,11 +510,11 @@ We proceed as with [[Invoking a subdialogue]] but we define a `VariableDeclarati
 the various parameters.  Be careful as initial value for each parameter is a JavaScript expression, 
 so don't forget relevant quoting:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 32-34
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 31-33
 
 We set those parameters in the turn as _submit parameters_:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 35-35
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 34-34
 
 ### Invoking a subdialogue and passing VoiceXML parameters
 
@@ -523,25 +527,24 @@ We proceed as with [[Invoking a subdialogue]] but we define some `SubdialoguePar
 objects will be used to create the various `<param>` elements in the generated VoiceXML, so you can either 
 create them with a regular _value_ or with a JavaScript _expression_:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 31-33
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-32
 
 The `SubdialogueParameter.createWithValue()` expects the parameter name and a string value.  It will yield:
 
 ```xml
     <param name="parameter1" value="string" />
-``` 
+```
 
 The `SubdialogueParameter.createWithExpression()` expects the parameter name and a JavaScript expression. The generated VoiceXML will be:
 
 ```xml
     <param name="parameter2" expr="2+3" />
     <param name="parameter3" expr="'string'" />
-``` 
-
+```
 
 We set those parameters in the turn as _subdialogue parameters_:
 
-!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 34-34
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-33
 
 ### Implementing a subdialogue
 
