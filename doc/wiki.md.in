@@ -525,6 +525,20 @@ create them with a regular _value_ or with a JavaScript _expression_:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 31-33
 
+The `SubdialogueParameter.createWithValue()` expects the parameter name and a string value.  It will yield:
+
+```xml
+    <param name="parameter1" value="string" />
+``` 
+
+The `SubdialogueParameter.createWithExpression()` expects the parameter name and a JavaScript expression. The generated VoiceXML will be:
+
+```xml
+    <param name="parameter2" expr="2+3" />
+    <param name="parameter3" expr="'string'" />
+``` 
+
+
 We set those parameters in the turn as _subdialogue parameters_:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 34-34
