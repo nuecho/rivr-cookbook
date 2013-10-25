@@ -529,6 +529,46 @@ We set those parameters in the turn as _subdialogue parameters_:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 34-34
 
+### Implementing a subdialogue
+
+!set branch subdialogue-implementation
+
+To implement a subdialogue is not different from implementing a normal dialogue except that it must end with the
+`<return>` VoiceXML element instead of `<exit>`, `<disconnect>`.  To generate a `<return>`, our dialogue simply need to
+return a `VoiceXmlReturnTurn`.  The return can either return named values (JavaScript values) or a VoiceXML event.
+
+Our dialogue ask for two numbers:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 28-31
+    
+To return those numbers as well as their sum, we prepare a `VariableDeclarationList`:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-36
+
+We need to be careful with variable declarations. Here, since we have numbers, we don't quote the values. The caller
+will receive JavaScript numbers, not strings. The resulting VoiceXML will be something like:
+
+```xml
+    <var name="number1" expr="12" /> 
+    <var name="number2" expr="10" /> 
+    <var name="sum" expr="22" /> 
+```
+
+We can now pass the `VariableDeclarationList` in the `VoiceXmlReturnTurn`:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 38-39
+
+We also show here how to return an event by using the other constructor. Event name is passed in the 
+second parameter and message (optional) is passed in the third parameter:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 40-43
+
+Here's a sample VoiceXML document invoking the subdialogue:
+
+!inline src/main/webapp/main.vxml 
+
+To try the example, the VoiceXML platform initial URL should be `http://<yourhostname>:8080/rivr-cookbook/main.vxml`
+
 # Using vendor-specific VoiceXML platform extensions
 
 ## Genesys Voice Platform 8 (GVP 8)
