@@ -3,6 +3,8 @@
 
   <form id="test">
     <subdialog name="twoNumbers" src="dialogue">
+      <param name="promptText1" value="Enter a number" />
+      <param name="promptText2" value="Enter another number" />
       <filled>
         <prompt>
           First number is
