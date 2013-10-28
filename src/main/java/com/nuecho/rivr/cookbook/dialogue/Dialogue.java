@@ -60,7 +60,7 @@ public class Dialogue implements VoiceXmlDialogue {
         DtmfRecognition dtmfRecognition = new DtmfRecognition(dtmfGrammar);
 
         Interaction interaction = interaction("get-dtmf")
-                .addPrompt(new SpeechSynthesis("Type a number."))
+                .addPrompt(dtmfRecognition, new SpeechSynthesis("Type a number."))
                 .build(dtmfRecognition, Duration.seconds(5));
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(interaction, context);
