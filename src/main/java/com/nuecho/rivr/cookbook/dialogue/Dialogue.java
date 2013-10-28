@@ -69,8 +69,8 @@ public class Dialogue implements VoiceXmlDialogue {
         Logger logger = context.getLogger();
         if (inputTurn.getRecognitionInfo() != null) {
             JsonArray recognitionResult = inputTurn.getRecognitionInfo().getRecognitionResult();
-            //Extracting the "utterance" of the first recognition hypothesis. 
-            String phoneNumber = recognitionResult.getJsonObject(0).getString("utterance");
+            //Extracting the "interpretation" of the first recognition hypothesis. 
+            String phoneNumber = recognitionResult.getJsonObject(0).getString("interpretation");
             logger.info("Phone number entered: " + phoneNumber);
         } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_INPUT, inputTurn.getEvents())) {
             logger.info("Timeout.");
