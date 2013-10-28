@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
   <form id="test">
+
+    <var name="parameter1" />
+    <var name="parameter2" />
+    <var name="parameter3" />
+
+    <block>
+      Parameter 1 is
+      <value expr="parameter1" />
+      .
+      Parameter 2 is
+      <value expr="parameter2" />
+      .
+      Parameter 3 is
+      <value expr="parameter3" />
+      .
+    </block>
+
     <field name="numberField" type="number">
-      <prompt>Say a number</prompt>
+      <prompt>
+        Say a number
+      </prompt>
     </field>
+
     <filled>
       <var name="number" expr="numberField" />
       <var name="status" expr="'success'" />
       <return namelist="number status" />
     </filled>
+
   </form>
 </vxml>
