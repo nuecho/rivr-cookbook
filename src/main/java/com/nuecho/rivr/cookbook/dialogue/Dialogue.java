@@ -4,9 +4,21 @@
 
 package com.nuecho.rivr.cookbook.dialogue;
 
+import static com.nuecho.rivr.voicexml.turn.output.OutputTurns.*;
+
+import javax.json.*;
+
+import org.slf4j.*;
+
+import com.nuecho.rivr.core.dialogue.*;
+import com.nuecho.rivr.core.util.*;
 import com.nuecho.rivr.voicexml.dialogue.*;
 import com.nuecho.rivr.voicexml.turn.first.*;
+import com.nuecho.rivr.voicexml.turn.input.*;
 import com.nuecho.rivr.voicexml.turn.last.*;
+import com.nuecho.rivr.voicexml.turn.output.*;
+import com.nuecho.rivr.voicexml.turn.output.audio.*;
+import com.nuecho.rivr.voicexml.turn.output.grammar.*;
 
 /**
  * The goal of the <code>Interaction</code> is to collect information from the
@@ -44,8 +56,26 @@ public class Dialogue implements VoiceXmlDialogue {
     public VoiceXmlLastTurn run(VoiceXmlFirstTurn firstTurn, VoiceXmlDialogueContext context)
             throws Exception {
 
+        GrammarItem dtmfGrammar = new GrammarReference("builtin:dtmf/digits");
+        DtmfRecognition dtmfRecognition = new DtmfRecognition(dtmfGrammar);
+
+        Interaction interaction = interaction("get-dtmf")
+                .addPrompt(new SpeechSynthesis("Type a number."))
+                .build(dtmfRecognition, Duration.seconds(5));
+
+        VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(interaction, context);
+
+        Logger logger = context.getLogger();
+        if (inputTurn.getRecognitionInfo() != null) {
+            JsonArray recognitionResult = inputTurn.getRecognitionInfo().getRecognitionResult();
+            //Extracting the "interpretation" of the first recognition hypothesis. 
+            String number = recognitionResult.getJsonObject(0).getString("interpretation");
+            logger.info("Number entered: " + number);
+        } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_INPUT, inputTurn.getEvents())) {
+            logger.info("Timeout.");
+        }
+
         //end of dialogue
         return new Exit("exit");
     }
-
 }
