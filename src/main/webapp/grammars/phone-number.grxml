@@ -10,26 +10,38 @@
   <!-- North-American phone number -->
   <!-- See http://en.wikipedia.org/wiki/North_American_Numbering_Plan -->
   <rule id="phoneNumber" scope="public">
+    <tag>out = "";</tag>
 
     <!-- optional country code: 1 -->
     <item repeat="0-1">1</item>
 
     <!-- NPA (area code) -->
     <ruleref uri="#r2to9" />
-    <ruleref uri="#r0to9" />
-    <ruleref uri="#r0to9" />
+    <tag>out += rules.latest()</tag>
+    <item repeat="2">
+      <item>
+        <ruleref uri="#r0to9" />
+        <tag>out += rules.latest()</tag>
+      </item>
+    </item>
 
     <!-- NXX -->
     <ruleref uri="#r2to9" />
-    <ruleref uri="#r0to9" />
-    <ruleref uri="#r0to9" />
+    <tag>out += rules.latest()</tag>
+    <item repeat="2">
+      <item>
+        <ruleref uri="#r0to9" />
+        <tag>out += rules.latest()</tag>
+      </item>
+    </item>
 
     <!-- XXXX -->
-    <ruleref uri="#r0to9" />
-    <ruleref uri="#r0to9" />
-    <ruleref uri="#r0to9" />
-    <ruleref uri="#r0to9" />
-
+    <item repeat="4">
+      <item>
+        <ruleref uri="#r0to9" />
+        <tag>out += rules.latest()</tag>
+      </item>
+    </item>
   </rule>
 
   <rule id="r0to9" scope="public">
