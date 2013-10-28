@@ -15,6 +15,7 @@ import com.nuecho.rivr.voicexml.turn.first.*;
 import com.nuecho.rivr.voicexml.turn.input.*;
 import com.nuecho.rivr.voicexml.turn.last.*;
 import com.nuecho.rivr.voicexml.turn.output.*;
+import com.nuecho.rivr.voicexml.turn.output.SubdialogueCall.Parameter;
 
 public class Dialogue implements VoiceXmlDialogue {
 
@@ -25,6 +26,11 @@ public class Dialogue implements VoiceXmlDialogue {
         SubdialogueCall subdialogueCall = new SubdialogueCall("invoke-subdialogue", "subdialogue.vxml");
 
         subdialogueCall.setMethod(SubmitMethod.post);
+
+        Parameter parameter1 = Parameter.createWithValue("parameter1", "string");
+        Parameter parameter2 = Parameter.createWithExpression("parameter2", "2+3");
+        Parameter parameter3 = Parameter.createWithExpression("parameter3", "'string'");
+        subdialogueCall.setSubdialogueParameters(parameter1, parameter2, parameter3);
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(subdialogueCall, context);
 
