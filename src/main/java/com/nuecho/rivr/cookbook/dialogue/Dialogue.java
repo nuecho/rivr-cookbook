@@ -11,6 +11,7 @@ import javax.json.*;
 import com.nuecho.rivr.core.dialogue.*;
 import com.nuecho.rivr.voicexml.dialogue.*;
 import com.nuecho.rivr.voicexml.rendering.voicexml.*;
+import com.nuecho.rivr.voicexml.turn.*;
 import com.nuecho.rivr.voicexml.turn.first.*;
 import com.nuecho.rivr.voicexml.turn.input.*;
 import com.nuecho.rivr.voicexml.turn.last.*;
@@ -25,6 +26,11 @@ public class Dialogue implements VoiceXmlDialogue {
         SubdialogueCall subdialogueCall = new SubdialogueCall("invoke-subdialogue", "subdialogue.vxml");
 
         subdialogueCall.setMethod(SubmitMethod.post);
+
+        VariableList parameters = new VariableList();
+        parameters.addWithExpression("parameter1", "'value1'");
+        parameters.addWithExpression("parameter2", "'value2'");
+        subdialogueCall.setSubmitParameters(parameters);
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(subdialogueCall, context);
 
