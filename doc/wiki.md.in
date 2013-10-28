@@ -15,7 +15,7 @@
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 27-66
 
-# Output Turns
+# Dialogue basics
 
 ## Messages
 
@@ -585,6 +585,30 @@ Here's a sample VoiceXML document invoking the subdialogue:
 !inline src/main/webapp/main.vxml 
 
 To try the example, the VoiceXML platform initial URL should be `http://<yourhostname>:8080/rivr-cookbook/main.vxml`
+
+### Reading subdialogue VoiceXML parameters
+
+!set branch subdialogue-implementation-voicexml-parameter
+
+First, make sure you understand the [[Implementing a subdialogue]] example.  The following example will show you
+how to read the parameters sent to a subdialogue using the `<param>` VoiceXML element: 
+
+!inline src/main/webapp/main.vxml 5-7
+    
+We are going the obtain the subdialogue parameters by declaring variables in the first output turn of the dialogue:   
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-31
+
+Note that the variable declaration can contain an initial expression.  In this case, the expression will act as the 
+default value of the parameters.  This is shown above with the `promptText2` parameter.
+
+Those declaration must be included in a `ScriptExecutionTurn`:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-34
+
+This turn is then executed and the subdialogue parameters are available as properties of the `jsonValue`:
+  
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-39
 
 # Using vendor-specific VoiceXML platform extensions
 
