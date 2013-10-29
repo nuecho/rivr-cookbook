@@ -59,14 +59,15 @@ public class Dialogue implements VoiceXmlDialogue {
         Recording recording = new Recording();
         recording.setBeep(true);
         recording.setPostAudioToServer(true);
+        recording.setClientSideAssignationDestination("application.recording");
         recording.setType("audio/x-wav");
         recording.setFinalSilence(Duration.seconds(2));
         recording.setDtmfTerm(true);
         recording.setMaximumTime(Duration.seconds(20));
 
-        SpeechSynthesis synthesisText = new SpeechSynthesis("Say your message after the beep.");
+        SpeechSynthesis promptMessage = new SpeechSynthesis("Say your message after the beep.");
         Interaction interaction = interaction("record")
-                .addPrompt(synthesisText)
+                .addPrompt(promptMessage)
                 .build(recording, Duration.seconds(5));
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(interaction, context);
@@ -89,6 +90,12 @@ public class Dialogue implements VoiceXmlDialogue {
             OutputStream outputStream = new FileOutputStream(outputFile);
             outputStream.write(file.getContent());
             outputStream.close();
+
+            Message playbackMessage = new Message("playback",
+                                                  new SpeechSynthesis("Here's your message: "),
+                                                  AudioFile.fromExpression("application.recording"));
+
+            DialogueUtils.doTurn(playbackMessage, context);
         } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_INPUT, inputTurn.getEvents())) {
             logger.info("Timeout.");
         }
