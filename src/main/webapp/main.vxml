@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
+
+  <form id="test">
+    <subdialog name="twoNumbers" src="dialogue">
+      <filled>
+        <prompt>
+          First number is
+          <value expr="twoNumbers.number1" />
+          , second number is
+          <value expr="twoNumbers.number2" />
+          and their sum is
+          <value expr="twoNumbers.sum" />
+          .
+        </prompt>
+      </filled>
+    </subdialog>
+  </form>
+</vxml>
+
