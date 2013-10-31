@@ -4,6 +4,7 @@
 
 package com.nuecho.rivr.cookbook.wiki;
 
+import static com.nuecho.rivr.cookbook.wiki.WikiDocProcessor.Mode.*;
 import static java.lang.String.*;
 
 import java.io.*;
@@ -28,13 +29,18 @@ public class WikiDocProcessor {
     static final Pattern INLINE_CODE_MARK = Pattern.compile("!inline\\s+(\\S+)(\\s+(\\d+)-(\\d+))?");
     static final Pattern EOL = Pattern.compile("(\\r\\n|\\n)");
     static final Pattern INDENT = Pattern.compile("^\\s+");
+    static final Pattern LINK = Pattern.compile("\\[\\[(.*)\\]\\]");
+
+    public enum Mode {
+        GITHUB, PANDOC, GITLAB;
+    }
 
     public static void main(String[] arguments) throws IOException, WikiDocProcessorException {
 
-        if (arguments.length < 4 || arguments.length > 5) {
+        if (arguments.length < 6) {
             System.out.println("usage:\n    java "
                                + WikiDocProcessor.class.getName()
-                               + " inputFile outputFile gitRepository [pandocMode]");
+                               + " inputFile outputFile repositoryPath rep [github|gitlab|pandoc]");
             System.exit(1);
         }
 
@@ -42,33 +48,39 @@ public class WikiDocProcessor {
         String outputDirectory = arguments[1];
         String repositoryPath = arguments[2];
         String gitHubUser = arguments[3];
+        String rep = arguments[4];
 
-        processFile(arguments, inputFilename, outputDirectory, repositoryPath, gitHubUser);
+        Mode mode;
+
+        String modeString = arguments[5];
+        if (modeString.equals("github")) {
+            mode = GITHUB;
+        } else if (modeString.equals("gitlab")) {
+            mode = GITLAB;
+        } else if (modeString.equals("pandoc")) {
+            mode = PANDOC;
+        } else throw new WikiDocProcessorException("Invalid mode: '" + modeString + "'.");
+
+        processFile(inputFilename, outputDirectory, repositoryPath, gitHubUser, mode, rep);
     }
 
-    private static void processFile(String[] arguments, String inputFilename, String outputDirectory,
-                                    String repositoryPath, String gitHubUser) throws IOException,
-            UnsupportedEncodingException, FileNotFoundException, AmbiguousObjectException,
-            IncorrectObjectTypeException, WikiDocProcessorException {
-        boolean pandocMode;
-
-        if (arguments.length == 5) {
-            String pandocModeString = arguments[4];
-            pandocMode = Boolean.parseBoolean(pandocModeString);
-        } else {
-            pandocMode = false;
-        }
+    private static void processFile(String inputFilename,
+                                    String outputDirectory,
+                                    String repositoryPath,
+                                    String namespace,
+                                    Mode mode,
+                                    String currentRepository) throws IOException, UnsupportedEncodingException,
+            FileNotFoundException, AmbiguousObjectException, IncorrectObjectTypeException, WikiDocProcessorException {
 
         Git git = Git.open(new File(repositoryPath));
         Repository repository = git.getRepository();
 
         File inputFile = new File(inputFilename);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile),
-                                                                         "utf-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "utf-8"));
         PrintWriter writer;
 
-        if (pandocMode) {
+        if (mode == PANDOC) {
             writer = openFile(outputDirectory + "/wiki.md");
         } else {
             writer = new PrintWriter(new StringWriter());
@@ -79,7 +91,6 @@ public class WikiDocProcessor {
         String currentSection2 = null;
         String currentSection3 = null;
         String currentBranch = null;
-        String currentRepository = null;
 
         Map<String, Map<String, List<String>>> tableOfContents = new LinkedHashMap<String, Map<String, List<String>>>();
         Map<String, List<String>> sections2 = new HashMap<String, List<String>>();
@@ -98,28 +109,26 @@ public class WikiDocProcessor {
 
                 if (section1MarkMatcher.find()) {
                     if (inSection) {
-                        generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository,
-                                              pandocMode);
+                        generateSectionFooter(namespace, writer, currentBranch, currentRepository, mode);
                         inSection = false;
                     }
 
                     currentSection1 = section1MarkMatcher.group(1).trim();
                     sections2 = new LinkedHashMap<String, List<String>>();
-                    if (pandocMode) {
+                    if (mode == PANDOC) {
                         writer.println("# " + currentSection1);
                     }
                     tableOfContents.put(currentSection1, sections2);
 
                 } else if (section2MarkMatcher.find()) {
                     if (inSection) {
-                        generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository,
-                                              pandocMode);
+                        generateSectionFooter(namespace, writer, currentBranch, currentRepository, mode);
                         inSection = false;
                     }
 
                     currentSection2 = section2MarkMatcher.group(1).trim();
                     sections3 = new ArrayList<String>();
-                    if (pandocMode) {
+                    if (mode == PANDOC) {
                         writer.println("## " + currentSection2);
                     }
                     sections2.put(currentSection2, sections3);
@@ -129,16 +138,15 @@ public class WikiDocProcessor {
                     sections3.add(currentSection3);
 
                     if (inSection) {
-                        generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository,
-                                              pandocMode);
+                        generateSectionFooter(namespace, writer, currentBranch, currentRepository, mode);
                         inSection = false;
                     }
 
                     inSection = true;
 
-                    if (!pandocMode) {
+                    if (mode != PANDOC) {
                         writer.close();
-                        writer = openFile(outputDirectory + "/" + normalizeFileName(currentSection3));
+                        writer = openFile(outputDirectory + "/" + normalizeFileName(currentSection3, mode));
                     } else {
                         writer.println("### " + currentSection3);
                     }
@@ -162,26 +170,25 @@ public class WikiDocProcessor {
                     String lines = getFileLines(startLine, stopLine, blobInputStream);
                     String inlinedFile = normalizeIndent(lines);
 
-                    String revisionUrl = "https://github.com/"
-                                         + gitHubUser
-                                         + "/"
-                                         + currentRepository
-                                         + "/blob/"
-                                         + currentBranch
-                                         + "/"
-                                         + filename;
+                    String repoUrl = getRepoUrl(namespace, mode, currentRepository);
+                    String revisionUrl = repoUrl + "/blob/" + currentBranch + "/" + filename;
 
                     String justFilename = filename.substring(filename.lastIndexOf('/') + 1);
-                    writer.println(">    [_" + justFilename + "_](" + revisionUrl + "):\n");
 
-                    if (pandocMode) {
+                    if (mode == GITLAB) {
+                        writer.println(">    [" + justFilename + "](" + revisionUrl + "):\n");
+                    } else {
+                        writer.println(">    [_" + justFilename + "_](" + revisionUrl + "):\n");
+                    }
+
+                    if (mode == PANDOC) {
                         writer.println("~~~~{.java .numberLines startFrom=\"" + startLine + "\"}");
                     } else {
                         writer.println("```java");
                     }
                     writer.print(inlinedFile);
 
-                    if (pandocMode) {
+                    if (mode == PANDOC) {
                         writer.println("~~~~");
                     } else {
                         writer.println("```");
@@ -192,21 +199,24 @@ public class WikiDocProcessor {
                     String value = setMarkMatcher.group(2);
                     if (key.equals("branch")) {
                         currentBranch = value;
-                    } else if (key.equals("repository")) {
-                        currentRepository = value;
-                    } else throw new WikiDocProcessorException("Unknown key '"
-                                                               + key
-                                                               + "' at line "
-                                                               + lineNumber);
+                    } else throw new WikiDocProcessorException("Unknown key '" + key + "' at line " + lineNumber);
                 } else {
+
+                    if (mode == GITLAB || mode == PANDOC) {
+                        Matcher linkMatcher = LINK.matcher(line);
+                        while (linkMatcher.find()) {
+                            String slug = linkMatcher.group(1).replaceAll("[^0-9A-Za-z]", "-");
+                            line = linkMatcher.replaceFirst("[$1](" + slug + ")");
+                        }
+                    }
                     writer.println(line);
                 }
             }
 
-            generateSectionFooter(gitHubUser, writer, currentBranch, currentRepository, pandocMode);
+            generateSectionFooter(namespace, writer, currentBranch, currentRepository, mode);
 
-            if (!pandocMode) {
-                writeTableOfContents(outputDirectory, tableOfContents);
+            if (mode != PANDOC) {
+                writeTableOfContents(outputDirectory, tableOfContents, mode, namespace, currentRepository);
             }
         } finally {
             writer.close();
@@ -215,39 +225,51 @@ public class WikiDocProcessor {
 
     }
 
-    private static void generateSectionFooter(String gitHubUser, PrintWriter writer, String branch,
-                                              String repository, boolean pandocMode) {
+    private static String getRepoUrl(String namespace, Mode mode, String currentRepository) {
+        String baseUrl = getBaseUrl(mode);
+        String repoUrl = baseUrl + namespace + "/" + currentRepository;
+        return repoUrl;
+    }
+
+    private static void generateSectionFooter(String namespace,
+                                              PrintWriter writer,
+                                              String branch,
+                                              String repository,
+                                              Mode mode) {
         if (branch == null) return;
 
-        if (pandocMode) return;
+        if (mode == PANDOC) return;
 
         writer.println();
         writer.println("---------------------------");
         writer.println();
         writer.println("#### Running this example");
 
-        String downloadUrl = "https://github.com/"
-                             + gitHubUser
-                             + "/"
-                             + repository
-                             + "/archive/"
-                             + branch
-                             + ".zip";
-        String browseUrl = "https://github.com/" + gitHubUser + "/" + repository + "/tree/" + branch;
+        String baseUrl = getBaseUrl(mode);
 
-        writer.println(format("You can [download](%s) or [browse](%s) the complete code for this example at GitHub."
-                                      + "This is a complete working application that you can build and run for yourself.",
-                              downloadUrl, browseUrl));
+        String downloadUrl = baseUrl + namespace + "/" + repository + "/archive/" + branch + ".zip";
+        String browseUrl = baseUrl + namespace + "/" + repository + "/tree/" + branch;
+
+        if (mode == GITHUB) {
+            writer.println(format("You can [download](%s) or [browse](%s) the complete code for this example at GitHub."
+                                          + "This is a complete working application that you can build and run for yourself.",
+                                  downloadUrl,
+                                  browseUrl));
+        } else {
+            writer.println(format("You can [browse](%s) the complete code for this example at GitHub."
+                                          + "This is a complete working application that you can build and run for yourself.",
+                                  browseUrl));
+
+        }
         writer.println();
         writer.println("You can also clone the Rivr Cookbook repository and checkout this example:");
         writer.println();
-        writer.println("`git clone -b "
-                       + branch
-                       + " git@github.com:"
-                       + gitHubUser
-                       + "/"
-                       + repository
-                       + ".git`");
+        if (mode == GITHUB) {
+            writer.println("`git clone -b " + branch + " git@github.com:" + namespace + "/" + repository + ".git`");
+        }
+        if (mode == GITLAB) {
+            writer.println("`git clone -b " + branch + " git@gl.s.nuecho.com:" + namespace + "/" + repository + ".git`");
+        }
         writer.println();
         writer.println("Then, to build and run it:");
         writer.println();
@@ -262,23 +284,38 @@ public class WikiDocProcessor {
         writer.println();
     }
 
-    private static void writeTableOfContents(String outputDirectory,
-                                             Map<String, Map<String, List<String>>> tableOfContents)
-            throws UnsupportedEncodingException, FileNotFoundException {
-        writeTableOfContents(outputDirectory, tableOfContents, "Home.md");
+    private static String getBaseUrl(Mode mode) {
+        return mode == GITHUB ? "https://github.com/" : "http://gl.s.nuecho.com/";
     }
 
     private static void writeTableOfContents(String outputDirectory,
                                              Map<String, Map<String, List<String>>> tableOfContents,
-                                             String filename) throws UnsupportedEncodingException,
+                                             Mode mode,
+                                             String namespace,
+                                             String repository) throws UnsupportedEncodingException,
+            FileNotFoundException {
+        String tocFilename = normalizeFileName("Home", mode);
+
+        writeTableOfContents(outputDirectory, tableOfContents, tocFilename, mode, namespace, repository);
+    }
+
+    private static void writeTableOfContents(String outputDirectory,
+                                             Map<String, Map<String, List<String>>> tableOfContents,
+                                             String filename,
+                                             Mode mode,
+                                             String namespace,
+                                             String repository) throws UnsupportedEncodingException,
             FileNotFoundException {
         PrintWriter tableOfContentsWriter = openFile(outputDirectory + "/" + filename);
-        writeTableOfContents(tableOfContents, tableOfContentsWriter);
+        writeTableOfContents(tableOfContents, tableOfContentsWriter, mode, namespace, repository);
         tableOfContentsWriter.close();
     }
 
     private static void writeTableOfContents(Map<String, Map<String, List<String>>> tableOfContents,
-                                             PrintWriter writer) {
+                                             PrintWriter writer,
+                                             Mode mode,
+                                             String namespace,
+                                             String repository) {
 
         writer.println("<center>");
         writer.println("![Rivr logo](http://rivr.nuecho.com/img/logo.png)");
@@ -296,19 +333,33 @@ public class WikiDocProcessor {
             for (Entry<String, List<String>> section2Entry : entry.getValue().entrySet()) {
                 writer.println("    1. " + section2Entry.getKey());
                 for (String section3Name : section2Entry.getValue()) {
-                    writer.println("        1. [[" + section3Name + "]]");
+                    if (mode == GITHUB) {
+                        writer.println("        1. [[" + section3Name + "]]");
+                    } else {
+                        String section3NameSlug = section3Name.replaceAll("[^a-zA-Z0-9]", "-");
+                        writer.println("        1. [" + section3Name + "](" + section3NameSlug + ")");
+                    }
                 }
             }
         }
 
         writer.println();
         writer.println("You haven't found your answer here?  Something is not right? Let us know by "
-                       + "[opening an issue](https://github.com/nuecho/rivr-cookbook/issues/new) "
+                       + "[opening an issue]("
+                       + getRepoUrl(namespace, mode, repository)
+                       + "/issues/new) "
                        + "and we'll do our best to adjust the recipes or to provide a new one.");
     }
 
-    private static String normalizeFileName(String item) {
-        return normalizeWiki(item) + ".md";
+    private static String normalizeFileName(String item, Mode mode) {
+        String suffix;
+        if (mode == GITLAB) {
+            suffix = ".markdown";
+        } else {
+            suffix = ".md";
+        }
+
+        return normalizeWiki(item) + suffix;
     }
 
     private static String normalizeWiki(String item) {
@@ -317,13 +368,12 @@ public class WikiDocProcessor {
 
     private static PrintWriter openFile(String outputFilename) throws UnsupportedEncodingException,
             FileNotFoundException {
-        return new PrintWriter(
-                               new OutputStreamWriter(new FileOutputStream(new File(outputFilename)), "utf-8"));
+        return new PrintWriter(new OutputStreamWriter(new FileOutputStream(new File(outputFilename)), "utf-8"));
     }
 
     private static InputStream getBlobInputStream(Repository repository, String reference, String path)
-            throws AmbiguousObjectException, IncorrectObjectTypeException, IOException,
-            WikiDocProcessorException, UnsupportedEncodingException {
+            throws AmbiguousObjectException, IncorrectObjectTypeException, IOException, WikiDocProcessorException,
+            UnsupportedEncodingException {
         String revString = reference + ":" + path;
         ObjectId objectId = repository.resolve(revString);
         if (objectId == null) throw new WikiDocProcessorException("Unable to find object for " + revString);
@@ -337,8 +387,7 @@ public class WikiDocProcessor {
         return objectLoader.openStream();
     }
 
-    private static String getFileLines(int startLine, int stopLine, InputStream inputStream)
-            throws IOException {
+    private static String getFileLines(int startLine, int stopLine, InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
         StringBuilder builder = new StringBuilder();

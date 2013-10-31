@@ -22,18 +22,31 @@ eclipse {
 
 dependencies { compile 'org.eclipse.jgit:org.eclipse.jgit:3.0.0.201306101825-r' }
 
-task wikiDoc (type: JavaExec) {
+task wikiDocGithub (type: JavaExec) {
     main = "com.nuecho.rivr.cookbook.wiki.WikiDocProcessor"
     classpath = sourceSets.main.runtimeClasspath
     args=[
         "${project.projectDir}/doc/wiki.md.in",
-        "${project.projectDir}/../rivr-cookbook.wiki/cookbook",
+        "${project.projectDir}/../rivr-cookbook.wiki-github/",
         "${project.projectDir}",
         "nuecho",
-        "false"
+        "rivr-cookbook",
+        "github"
     ]
 }
 
+task wikiDocGitlab (type: JavaExec) {
+    main = "com.nuecho.rivr.cookbook.wiki.WikiDocProcessor"
+    classpath = sourceSets.main.runtimeClasspath
+    args=[
+        "${project.projectDir}/doc/wiki.md.in",
+        "${project.projectDir}/../rivr-cookbook.wiki-gitlab/",
+        "${project.projectDir}",
+        "rivr",
+        "cookbook",
+        "gitlab"
+    ]
+}
 task wikiDocPandoc (type: JavaExec) {
     main = "com.nuecho.rivr.cookbook.wiki.WikiDocProcessor"
     classpath = sourceSets.main.runtimeClasspath
@@ -42,6 +55,9 @@ task wikiDocPandoc (type: JavaExec) {
         "${project.projectDir}/doc",
         "${project.projectDir}",
         "nuecho",
-        "true"
+        "cookbook",
+        "pandoc"
     ]
 }
+
+
