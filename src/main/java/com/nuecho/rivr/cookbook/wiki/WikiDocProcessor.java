@@ -202,11 +202,17 @@ public class WikiDocProcessor {
                     } else throw new WikiDocProcessorException("Unknown key '" + key + "' at line " + lineNumber);
                 } else {
 
-                    if (mode == GITLAB || mode == PANDOC) {
+                    if (mode == GITLAB) {
                         Matcher linkMatcher = LINK.matcher(line);
                         while (linkMatcher.find()) {
                             String slug = linkMatcher.group(1).replaceAll("[^0-9A-Za-z]", "-");
                             line = linkMatcher.replaceFirst("[$1](" + slug + ")");
+                        }
+                    } else if (mode == PANDOC) {
+                        Matcher linkMatcher = LINK.matcher(line);
+                        while (linkMatcher.find()) {
+                            String slug = linkMatcher.group(1).replaceAll("[^0-9A-Za-z]", "-").toLowerCase();
+                            line = linkMatcher.replaceFirst("[$1](#" + slug + ")");
                         }
                     }
                     writer.println(line);
