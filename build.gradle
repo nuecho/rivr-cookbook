@@ -54,7 +54,7 @@ task wikiDocPandoc (type: JavaExec) {
         "${project.projectDir}/doc/wiki.md.in",
         "${project.projectDir}/doc",
         "${project.projectDir}",
-        "nuecho",
+        "rivr",
         "cookbook",
         "pandoc"
     ]
