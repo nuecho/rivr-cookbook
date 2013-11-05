@@ -56,11 +56,14 @@ public class Dialogue implements VoiceXmlDialogue {
     public VoiceXmlLastTurn run(VoiceXmlFirstTurn firstTurn, VoiceXmlDialogueContext context)
             throws Exception {
 
-        GrammarItem dtmfGrammar = new GrammarReference("builtin:dtmf/digits");
+        GrammarItem dtmfGrammar = new GrammarReference("builtin:dtmf/digits?minlength=5&maxlength=10");
         DtmfRecognition dtmfRecognition = new DtmfRecognition(dtmfGrammar);
+        dtmfRecognition.setInterDigitTimeout(Duration.seconds(2));
+        dtmfRecognition.setTermChar("*");
+        dtmfRecognition.setTermTimeout(Duration.milliseconds(800));
 
         Interaction interaction = interaction("get-dtmf")
-                .addPrompt(new SpeechSynthesis("Type a number."))
+                .addPrompt(new SpeechSynthesis("Type a number between 5 and 10 digits long."))
                 .build(dtmfRecognition, Duration.seconds(5));
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(interaction, context);
@@ -73,8 +76,9 @@ public class Dialogue implements VoiceXmlDialogue {
             logger.info("Number entered: " + number);
         } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_INPUT, inputTurn.getEvents())) {
             logger.info("Timeout.");
+        } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_MATCH, inputTurn.getEvents())) {
+            logger.info("No-match.");
         }
-
         //end of dialogue
         return new Exit("exit");
     }
