@@ -6,12 +6,9 @@ package com.nuecho.rivr.cookbook.dialogue;
 
 import static com.nuecho.rivr.voicexml.turn.output.OutputTurns.*;
 
-import javax.json.*;
-
 import org.slf4j.*;
 
 import com.nuecho.rivr.core.dialogue.*;
-import com.nuecho.rivr.core.util.*;
 import com.nuecho.rivr.voicexml.dialogue.*;
 import com.nuecho.rivr.voicexml.turn.first.*;
 import com.nuecho.rivr.voicexml.turn.input.*;
@@ -56,23 +53,28 @@ public class Dialogue implements VoiceXmlDialogue {
     public VoiceXmlLastTurn run(VoiceXmlFirstTurn firstTurn, VoiceXmlDialogueContext context)
             throws Exception {
 
-        GrammarItem dtmfGrammar = new GrammarReference("builtin:dtmf/digits");
+        GrammarItem dtmfGrammar = new GrammarReference("builtin:dtmf/digits?length=1");
         DtmfRecognition dtmfRecognition = new DtmfRecognition(dtmfGrammar);
+        dtmfRecognition.setTermChar("");
 
-        Interaction interaction = interaction("get-dtmf")
-                .addPrompt(new SpeechSynthesis("Type a number."))
-                .build(dtmfRecognition, Duration.seconds(5));
+        String text = "You can interrupt this message at any time by pressing any key. "
+                      + "Here goes a very long message...";
+
+        Interaction interaction = interaction("interruptible-message")
+                .addPrompt(dtmfRecognition, new SpeechSynthesis(text))
+                .build();
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(interaction, context);
 
         Logger logger = context.getLogger();
-        if (inputTurn.getRecognitionInfo() != null) {
-            JsonArray recognitionResult = inputTurn.getRecognitionInfo().getRecognitionResult();
-            //Extracting the "interpretation" of the first recognition hypothesis. 
-            String number = recognitionResult.getJsonObject(0).getString("interpretation");
-            logger.info("Number entered: " + number);
-        } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_INPUT, inputTurn.getEvents())) {
-            logger.info("Timeout.");
+        if (inputTurn.getRecognitionInfo() != null
+            || VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_MATCH, inputTurn.getEvents())) {
+            logger.info("Message has been interrupted");
+        } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.CONNECTION_DISCONNECT_HANGUP,
+                                          inputTurn.getEvents())) {
+            logger.info("User hung-up during message.");
+        } else {
+            logger.info("Message has been played completely");
         }
 
         //end of dialogue
