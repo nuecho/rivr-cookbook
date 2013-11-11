@@ -56,11 +56,12 @@ public class Dialogue implements VoiceXmlDialogue {
     public VoiceXmlLastTurn run(VoiceXmlFirstTurn firstTurn, VoiceXmlDialogueContext context)
             throws Exception {
 
-        GrammarItem dtmfGrammar = new GrammarReference("builtin:dtmf/digits");
+        GrammarItem dtmfGrammar = new GrammarReference(context.getContextPath()
+                                                       + "/grammars/phone-number.grxml");
         DtmfRecognition dtmfRecognition = new DtmfRecognition(dtmfGrammar);
 
-        Interaction interaction = interaction("get-dtmf")
-                .addPrompt(new SpeechSynthesis("Type a number."))
+        Interaction interaction = interaction("get-phone-number")
+                .addPrompt(new SpeechSynthesis("Enter your phone number."))
                 .build(dtmfRecognition, Duration.seconds(5));
 
         VoiceXmlInputTurn inputTurn = DialogueUtils.doTurn(interaction, context);
@@ -68,11 +69,13 @@ public class Dialogue implements VoiceXmlDialogue {
         Logger logger = context.getLogger();
         if (inputTurn.getRecognitionInfo() != null) {
             JsonArray recognitionResult = inputTurn.getRecognitionInfo().getRecognitionResult();
-            //Extracting the "interpretation" of the first recognition hypothesis. 
-            String number = recognitionResult.getJsonObject(0).getString("interpretation");
-            logger.info("Number entered: " + number);
+            //Extracting the "utterance" of the first recognition hypothesis. 
+            String phoneNumber = recognitionResult.getJsonObject(0).getString("utterance");
+            logger.info("Phone number entered: " + phoneNumber);
         } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_INPUT, inputTurn.getEvents())) {
             logger.info("Timeout.");
+        } else if (VoiceXmlEvent.hasEvent(VoiceXmlEvent.NO_MATCH, inputTurn.getEvents())) {
+            logger.info("Invalid phone number");
         }
 
         //end of dialogue
