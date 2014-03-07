@@ -871,6 +871,22 @@ You can try it with the following URI:
 
 # Other recipes
 
+## Getting information from HTTP
+
+### Extracting HTTP parameters
+
+!set branch http-parameters
+
+This example shows how to extract HTTP parameters and used them in a dialogue.  The parameters can be passed in the query string (e.g. `http://localhost:8080/rivr-cookbook/dialogue?name=value`) or in the body of the request (content-type: application/x-www-form-urlencoded), such as a POST. 
+
+HTTP parameters can be obtained in the `VoiceXmlFirstTurn` with the `getParameters()` method:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 22-22
+
+Here, we use the parameters names and values to play a message:
+
+!inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 24-31
+
 ## Getting information from the platform
 
 ### Getting CLID and DNIS
