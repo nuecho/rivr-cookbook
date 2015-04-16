@@ -25,6 +25,9 @@ public class WikiDocProcessor {
     static final Pattern SECTION_2_MARK = Pattern.compile("^##(?!#)(.*)");
     static final Pattern SECTION_3_MARK = Pattern.compile("^###(.*)");
 
+    static final Pattern RIVR_JAVA_ITEM = Pattern.compile("`((com[.]nuecho[.]rivr[.].*?[.])([A-Z][^#]+?)(#.*?)?)`");
+    static final Pattern RIVR_JAVA_ITEM_METHOD_PART = Pattern.compile("#((.*?)[(].*?[)])"); //method name + arg list
+
     static final Pattern SET_MARK = Pattern.compile("!set\\s+(.+?)\\s+(.+)");
     static final Pattern INLINE_CODE_MARK = Pattern.compile("!inline\\s+(\\S+)(\\s+(\\d+)-(\\d+))?");
     static final Pattern EOL = Pattern.compile("(\\r\\n|\\n)");
@@ -37,10 +40,10 @@ public class WikiDocProcessor {
 
     public static void main(String[] arguments) throws IOException, WikiDocProcessorException {
 
-        if (arguments.length < 6) {
+        if (arguments.length < 7) {
             System.out.println("usage:\n    java "
                                + WikiDocProcessor.class.getName()
-                               + " inputFile outputFile repositoryPath rep [github|gitlab|pandoc]");
+                               + " inputFile outputFile repositoryPath rep javadoc-base-path [github|gitlab|pandoc]");
             System.exit(1);
         }
 
@@ -49,10 +52,11 @@ public class WikiDocProcessor {
         String repositoryPath = arguments[2];
         String gitHubUser = arguments[3];
         String rep = arguments[4];
+        String javadocBasePath = arguments[5];
 
         Mode mode;
 
-        String modeString = arguments[5];
+        String modeString = arguments[6];
         if (modeString.equals("github")) {
             mode = GITHUB;
         } else if (modeString.equals("gitlab")) {
@@ -61,7 +65,7 @@ public class WikiDocProcessor {
             mode = PANDOC;
         } else throw new WikiDocProcessorException("Invalid mode: '" + modeString + "'.");
 
-        processFile(inputFilename, outputDirectory, repositoryPath, gitHubUser, mode, rep);
+        processFile(inputFilename, outputDirectory, repositoryPath, gitHubUser, mode, rep, javadocBasePath);
     }
 
     private static void processFile(String inputFilename,
@@ -69,7 +73,8 @@ public class WikiDocProcessor {
                                     String repositoryPath,
                                     String namespace,
                                     Mode mode,
-                                    String currentRepository) throws IOException, UnsupportedEncodingException,
+                                    String currentRepository,
+                                    String javadocBasePath) throws IOException, UnsupportedEncodingException,
             FileNotFoundException, AmbiguousObjectException, IncorrectObjectTypeException, WikiDocProcessorException {
 
         Git git = Git.open(new File(repositoryPath));
@@ -215,6 +220,31 @@ public class WikiDocProcessor {
                             line = linkMatcher.replaceFirst("[$1](#" + slug + ")");
                         }
                     }
+
+                    Matcher rivrClassMatcher = RIVR_JAVA_ITEM.matcher(line);
+                    while (rivrClassMatcher.find()) {
+                        String item = rivrClassMatcher.group(1);
+                        String shortClassName = rivrClassMatcher.group(3);
+                        String packageName = rivrClassMatcher.group(2);
+
+                        String uri = javadocBasePath + packageName.replace('.', '/') + shortClassName + ".html";
+
+                        String displayItem;
+
+                        Matcher methodPartMatcher = RIVR_JAVA_ITEM_METHOD_PART.matcher(item);
+
+                        if (methodPartMatcher.find()) {
+                            uri += "#" + methodPartMatcher.group(1);
+                            String methodName = methodPartMatcher.group(2);
+                            displayItem = methodName;
+                        } else {
+                            displayItem = shortClassName;
+                        }
+
+                        line = rivrClassMatcher.replaceFirst("[`" + displayItem + "`](" + uri + ")");
+                        rivrClassMatcher = RIVR_JAVA_ITEM.matcher(line);
+                    }
+
                     writer.println(line);
                 }
             }

@@ -31,6 +31,7 @@ task wikiDocGithub (type: JavaExec) {
         "${project.projectDir}",
         "nuecho",
         "rivr-cookbook",
+        "http://nuecho.github.io/rivr/javadoc/",
         "github"
     ]
 }
@@ -44,6 +45,7 @@ task wikiDocGitlab (type: JavaExec) {
         "${project.projectDir}",
         "rivr",
         "cookbook",
+        "http://nuecho.github.io/rivr/javadoc/",        
         "gitlab"
     ]
 }
@@ -56,6 +58,7 @@ task wikiDocPandoc (type: JavaExec) {
         "${project.projectDir}",
         "rivr",
         "cookbook",
+        "javadoc/",
         "pandoc"
     ]
 }
