@@ -6,7 +6,7 @@
 
 !set branch hello-world
 
-This example shows how to implement a simple dialogue.  It only plays a single message and then hang-up.
+This example shows how to implement a simple dialogue. It only plays a single message and then hang-up.
 
 First step is to provide an implementation of `com.nuecho.rivr.voicexml.dialogue.VoiceXmlDialogue` and code the dialogue in the `com.nuecho.rivr.core.dialogue.Dialogue#run(F, C)` method:
 
@@ -18,7 +18,7 @@ Next, the `web.xml` must contain:
 * an `<init-param>` specifying which dialogue class to instantiate
 * a `<servlet-mapping>` entry
 
-!inline src/main/webapp/WEB-INF/web.xml 
+!inline src/main/webapp/WEB-INF/web.xml
 
 Once compiled and deployed, the dialogue is ready to be called by the VoiceXML platform.
 
@@ -34,7 +34,7 @@ This example shows how to perform error handling and to build a return structure
 
 ## Messages
 
-### Playing a speech synthesis message 
+### Playing a speech synthesis message
 
 !set branch message-speech-synthesis
 
@@ -46,25 +46,25 @@ To play a speech synthesis message (a.k.a. text-to-speech or TTS), a `com.nuecho
 
 !set branch message-audio-file
 
-To play a prerecorded audio file, an `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` object is needed. This object can be created by 
-a factory method.  Here, since we want to play an audio file from a location (URI or path), we will use the
-`com.nuecho.rivr.voicexml.turn.output.audio.AudioFile#fromLocation(java.lang.String)` static method.  This `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` must then be used in a `com.nuecho.rivr.voicexml.turn.output.Message` output turn:
+To play a prerecorded audio file, an `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` object is needed. This object can be created by
+a factory method. Here, since we want to play an audio file from a location (URI or path), we will use the
+`com.nuecho.rivr.voicexml.turn.output.audio.AudioFile#fromLocation(java.lang.String)` static method. This `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` must then be used in a `com.nuecho.rivr.voicexml.turn.output.Message` output turn:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-33
 
-Note that here, the path of the audio file will be based on the _context path_, i.e. the path under which the application 
-is deployed on the web application server.  The context path is exposed as a property of the `com.nuecho.rivr.voicexml.dialogue.VoiceXmlDialogueContext`.
+Note that here, the path of the audio file will be based on the _context path_, i.e. the path under which the application
+is deployed on the web application server. The context path is exposed as a property of the `com.nuecho.rivr.voicexml.dialogue.VoiceXmlDialogueContext`.
 
 ### Playing an audio file with alternate synthesis text
 
 !set branch message-audio-file-with-alternate
 
-It is possible to play altenate content whenever an audio cannot be played (i.e. fetch problem, bad file format, etc).   The
+It is possible to play altenate content whenever an audio cannot be played (i.e. fetch problem, bad file format, etc). The
 alternate text can be specified as the second argument of the `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile#fromLocation(java.lang.String, java.lang.String)` factory method:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-34
 
-The alternate text can either be a `String` or a `com.nuecho.rivr.voicexml.turn.output.audio.SpeechSynthesis`.  Either way, it will generate synthetized speech.
+The alternate text can either be a `String` or a `com.nuecho.rivr.voicexml.turn.output.audio.SpeechSynthesis`. Either way, it will generate synthetized speech.
 
 ### Playing SSML content
 
@@ -91,7 +91,7 @@ To play multiple audio items (prerecorded audio file, speech synthesis, pause, e
 
 !set branch message-pause
 
-The `com.nuecho.rivr.voicexml.turn.output.audio.Pause` audio item is a way to generate a pause (i.e. a <break> element in VoiceXML).  The duration of the pause must be specified with a `com.nuecho.rivr.core.util.Duration` which has some factory methods.
+The `com.nuecho.rivr.voicexml.turn.output.audio.Pause` audio item is a way to generate a pause (i.e. a <break> element in VoiceXML). The duration of the pause must be specified with a `com.nuecho.rivr.core.util.Duration` which has some factory methods.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-35
 
@@ -111,7 +111,7 @@ This can also be done globally at the VoiceXML level:
 
 !set branch message-barge-in
 
-First, we need to disable to fetchaudio property.  Maybe the platform default is already empty, but to make sure:
+First, we need to disable to fetchaudio property. Maybe the platform default is already empty, but to make sure:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-35
 
@@ -119,7 +119,7 @@ Then, we can queue the message with the barge-in flag set.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 37-44
 
-Now, in the next interaction, the VoiceXML prompt queue will be flush because we are entering a _waiting state_.  Since barge-in flag was set,
+Now, in the next interaction, the VoiceXML prompt queue will be flush because we are entering a _waiting state_. Since barge-in flag was set,
 the user can press a digit during the message and the interaction will complete.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 46-50
@@ -130,19 +130,19 @@ the user can press a digit during the message and the interaction will complete.
 
 !set branch simple-dtmf-interaction
 
-This example shows how to collect a DTMF string from the caller.  It involves the `com.nuecho.rivr.voicexml.turn.output.Interaction` turn which is created using the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder`.
+This example shows how to collect a DTMF string from the caller. It involves the `com.nuecho.rivr.voicexml.turn.output.Interaction` turn which is created using the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder`.
 
-The first thing we need to do is to create the `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition`.  This object contains the DTMF grammar used for DTMF recognition.
-There are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification.  We are going to use `digits`.
+The first thing we need to do is to create the `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition`. This object contains the DTMF grammar used for DTMF recognition.
+There are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification. We are going to use `digits`.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 59-60
 
-Then we need to build the interaction.  We are going to instanciate an `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder` for this task. There is two ways to get the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder` object:
+Then we need to build the interaction. We are going to instanciate an `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder` for this task. There is two ways to get the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder` object:
 
-1. by calling the static method `com.nuecho.rivr.voicexml.turn.output.OutputTurns#interaction(java.lang.String)`  
+1. by calling the static method `com.nuecho.rivr.voicexml.turn.output.OutputTurns#interaction(java.lang.String)`
 2. by using the constructor of `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#Interaction.Builder(java.lang.String)` directly
 
-We'll use the first method. 
+We'll use the first method.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
@@ -150,12 +150,12 @@ Note that we've used a static import for the `com.nuecho.rivr.core.test.TestDial
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 7-7
 
-Then we need to specify the prompts that we are going to use.  This is done with the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method.  Here we just use a `com.nuecho.rivr.voicexml.turn.output.audio.SpeechSynthesis` message.
+Then we need to specify the prompts that we are going to use. This is done with the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method. Here we just use a `com.nuecho.rivr.voicexml.turn.output.audio.SpeechSynthesis` message.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
 
 To create the `com.nuecho.rivr.voicexml.turn.output.Interaction` itself, we invoke the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#build(com.nuecho.rivr.voicexml.turn.output.DtmfRecognition, com.nuecho.rivr.core.util.Duration, com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method and we pass the `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition` object, meaning that we want to
-perform DTMF recognition immediately after prompts are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raised.
+perform DTMF recognition immediately after prompts are played. We also need to specify the time-out value, i.e. the time before a `no-input` event is raised.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
 
@@ -163,7 +163,7 @@ Now that we have an `com.nuecho.rivr.voicexml.turn.output.Interaction`, we can e
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-66
 
-We now need to inspect the result in order to know what has been done by the user.  We are going to deal with the following two outcomes
+We now need to inspect the result in order to know what has been done by the user. We are going to deal with the following two outcomes
 
 1. The user has typed a number
 2. The user hasn't enter anything
@@ -177,13 +177,13 @@ The `com.nuecho.rivr.core.channel.InputTurn` contains a `recognitionInfo` proper
 
 !set branch barge-in-dtmf-interaction
 
-This example is very similar to [[Collecting DTMF]].  Here, we will allow the user to type the number while the prompt is being played.  This behaviour is also known as _barge-in_.
+This example is very similar to [[Collecting DTMF]]. Here, we will allow the user to type the number while the prompt is being played. This behaviour is also known as _barge-in_.
 
-In order to do that, we use a diffent signature of the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.DtmfRecognition, com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method.  We use the one where you can specify a `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition`:
+In order to do that, we use a diffent signature of the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.DtmfRecognition, com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method. We use the one where you can specify a `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition`:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-65
 
-The `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition` object is used twice in this statement.  It is important to understand why:
+The `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition` object is used twice in this statement. It is important to understand why:
 
 1. The fact that we specify a `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition` _in the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.DtmfRecognition, com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method_ indicates that the user can perform input _while the prompt is playing_.
 2. The fact that we specify a `com.nuecho.rivr.voicexml.turn.output.DtmfRecognition` _in the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#build(com.nuecho.rivr.voicexml.turn.output.DtmfRecognition, com.nuecho.rivr.core.util.Duration, com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method_ indicates that the user can also perform input _after the prompts are played_.
@@ -212,10 +212,10 @@ by getting the _utterance_ property of the recognition result.
 !set branch dtmf-grammar-with-semantic
 
 In the other DTMF recognition examples where a built-in grammar was used, we have rather used the _interpretation_ property of the
-recognition result because built-in grammars provide a _semantic interpretation_.  It is better to work with the interpretation than the raw utterance.
+recognition result because built-in grammars provide a _semantic interpretation_. It is better to work with the interpretation than the raw utterance.
 
 In our previous example ([[Using a DTMF grammar]]), the optional "1" will be part of the result if the caller has pressed the key, so we must deal with the fact that
-it may be present or not.  In other word, we need to do the normalization in the dialogue.  It's also possible that DTMF _utterance_ will
+it may be present or not. In other word, we need to do the normalization in the dialogue. It's also possible that DTMF _utterance_ will
 contains space between each digits (i.e. `5 1 4 5 5 5 1 2 3 4`), so there is another normalization to do there also.
 
 If the grammar provides semantic tags, you have control over what is returned in the recognition result.
@@ -230,13 +230,13 @@ Here's how to access the result:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 69-79
 
-Note that the phone number doesn't need any normalization at this point.  The optional country code will not be part of the interpretation.
+Note that the phone number doesn't need any normalization at this point. The optional country code will not be part of the interpretation.
 
 ### DTMF recognition options
 
 !set branch dtmf-options
 
-This example shows how to tune DTMF recognition.  The parameters describe here are explained in detail in the VoiceXML specification,
+This example shows how to tune DTMF recognition. The parameters describe here are explained in detail in the VoiceXML specification,
 [Section 6.3.3](http://www.w3.org/TR/voicexml20/#dml6.3.3) and [Appendix D - Timing Properties / DTMF Grammar](http://www.w3.org/TR/voicexml20/#L9212)
 
 Let's start by having a grammar accepting a DTMF string between 5 and 10 digits long.
@@ -248,13 +248,13 @@ Now let's configure the _inter-digit time-out_, i.e. the maximum pause duration 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61
 
 Another option you can configure is the DTMF _term char_, i.e. the DMTF key the caller can press in order to terminate the input.
-This is the DTMF equivalent of the _Enter_ key.  So the user can press the DTMF _term char_ once the input is done,
+This is the DTMF equivalent of the _Enter_ key. So the user can press the DTMF _term char_ once the input is done,
 not having to wait for the _inter-digit time-out_.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
 The last parameter is _term time-out_, i.e. the time given to enter the term char once
-when no other character can be accepted (in our exemple, after the 10th digit).  The idea is to put a value
+when no other character can be accepted (in our exemple, after the 10th digit). The idea is to put a value
 for _term time-out_ that is shorter than _inter-digit time-out_ value.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
@@ -272,7 +272,7 @@ You can then perform the DTMF recognition by executing the turn:
 
 !set branch interruptible-message
 
-Sometime, it is required to play a message while giving the caller a way to interrupt it and skip the rest of it.  The following example explains how to do that.
+Sometime, it is required to play a message while giving the caller a way to interrupt it and skip the rest of it. The following example explains how to do that.
 
 First, we need to specify a DTMF grammar accepting a single digit:
 
@@ -287,7 +287,7 @@ There is no arguments in the `com.nuecho.rivr.voicexml.turn.output.Interaction.B
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-66
 
-If we need to check if the prompt has been interrupted, we can check if we got any DTMF recognition (a digit) or a no-match event (pound or asterisk).  We also must check for the _hang-up_ event.
+If we need to check if the prompt has been interrupted, we can check if we got any DTMF recognition (a digit) or a no-match event (pound or asterisk). We also must check for the _hang-up_ event.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 67-78
 
@@ -295,21 +295,21 @@ If we need to check if the prompt has been interrupted, we can check if we got a
 
 !set branch simple-speech-interaction
 
-This example shows how to perform speech recognition.  Like DTMF recognition, it involves the `com.nuecho.rivr.voicexml.turn.output.Interaction` which is created with the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder`.
+This example shows how to perform speech recognition. Like DTMF recognition, it involves the `com.nuecho.rivr.voicexml.turn.output.Interaction` which is created with the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder`.
 
-The first thing we need to do is to create the `com.nuecho.rivr.voicexml.turn.output.SpeechRecognition`.  This object contains the speech grammar used for speech recognition.  There
-are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification.  We are going to use `digits`.
+The first thing we need to do is to create the `com.nuecho.rivr.voicexml.turn.output.SpeechRecognition`. This object contains the speech grammar used for speech recognition. There
+are a few [built-in grammars](http://www.w3.org/TR/voicexml20/#dmlABuiltins) specified in the VoiceXML specification. We are going to use `digits`.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 59-60
 
-Then we need to build the interaction.  We are going to create an instance of `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder` for this task.
+Then we need to build the interaction. We are going to create an instance of `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder` for this task.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
-Then we need to specify the prompts that we are going to use.  This is done with the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method.  Here we just use a `com.nuecho.rivr.voicexml.turn.output.audio.SpeechSynthesis` object.
+Then we need to specify the prompts that we are going to use. This is done with the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#addPrompt(com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method. Here we just use a `com.nuecho.rivr.voicexml.turn.output.audio.SpeechSynthesis` object.
 
 To create the `com.nuecho.rivr.voicexml.turn.output.Interaction` itself, we invoke the `com.nuecho.rivr.voicexml.turn.output.Interaction.Builder#build(com.nuecho.rivr.voicexml.turn.output.SpeechRecognition, com.nuecho.rivr.core.util.Duration, com.nuecho.rivr.voicexml.turn.output.audio.AudioItem...)` method and we pass the `com.nuecho.rivr.voicexml.turn.output.SpeechRecognition` method, meaning that we want to
-perform speech recognition immediately after prompts are played.  We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
+perform speech recognition immediately after prompts are played. We also need to specify the time-out value, i.e. the time before a `no-input` event is raise.
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-64
 
@@ -332,31 +332,31 @@ The `com.nuecho.rivr.core.channel.InputTurn` contains a `recognitionInfo` proper
 
 !set branch speech-options
 
-This example shows how to tune speech recognition.  The parameters describe here are explained in detail in the VoiceXML specification,
+This example shows how to tune speech recognition. The parameters describe here are explained in detail in the VoiceXML specification,
 [Section 6.3.2](http://www.w3.org/TR/voicexml20/#dml6.3.2) and part of [Section 6.3.6](http://www.w3.org/TR/voicexml20/#dml6.3.6)
 
 Setting the confidence level, i.e. the minimum confidence level the result must have in order for the recognition not to throw a `nomatch` event:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
-Setting the right confidence level is very difficult.  If you put this value too high, you will create no-matches for utterances that could have
-been correct.  On the other hand, setting a value too low will accept incorrect results which should have been discarded.  One way to set this
+Setting the right confidence level is very difficult. If you put this value too high, you will create no-matches for utterances that could have
+been correct. On the other hand, setting a value too low will accept incorrect results which should have been discarded. One way to set this
 value correctly is to perform various benchmarks on the recognition engine using the same grammar and a representative sample.
 
 Setting the maximum number of hypotheses (a.k.a. _N-Best_) that should be returned by the recognition engine:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 63-63
 
-Getting several hypotheses allows you to inspect the result and propose the other hypotheses during a confirmation dialogue.  However,
-for UI design reasons, you should limit those confirmations to a reasonable number.  Also, asking many hypotheses is more CPU-demanding for
+Getting several hypotheses allows you to inspect the result and propose the other hypotheses during a confirmation dialogue. However,
+for UI design reasons, you should limit those confirmations to a reasonable number. Also, asking many hypotheses is more CPU-demanding for
 the recognition engine (depends on the grammar used).
 
 Setting the incomplete time-out, i.e. maximum silence duration after end of speech:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 64-64
 
-You may want to set this value high enough to give the user a chance to make pauses while speaking.  However, if you set this value too high, it will take
-longer for the engine to end the recognition and return the result.  If you are only asking a yes/no question, this time-out can be short (ie. something around 500 ms).
+You may want to set this value high enough to give the user a chance to make pauses while speaking. However, if you set this value too high, it will take
+longer for the engine to end the recognition and return the result. If you are only asking a yes/no question, this time-out can be short (ie. something around 500 ms).
 However, if you are asking a credit card number, this should be longer because people will hesitate and will naturally insert pauses between digit groups, so in this case,
 a 1500 ms value would be a good starting point.
 
@@ -364,18 +364,18 @@ Another time-out applying after end of speech, the _complete timeout_, can be se
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 65-65
 
-While apparently symmetrical to _incomplete timeout_, the _complete timeout_ is a more advanced setting.  The purpose of this setting is to allow the engine to
-end recognition after a pause (the _complete time-out_) if a complete recognition result is _available_.  If used adequatly, this can increase the responsiveness
+While apparently symmetrical to _incomplete timeout_, the _complete timeout_ is a more advanced setting. The purpose of this setting is to allow the engine to
+end recognition after a pause (the _complete time-out_) if a complete recognition result is _available_. If used adequatly, this can increase the responsiveness
 of the recognition.
 
 * In this example, if the user says "one two three four" and then pauses, the recognizer does not have a valid recognition result yet
-because a minimum of 5 digits is required.  So the _complete time-out_ does not apply here.  At this point, if the pause is longer than _incomplete time-out_,
+because a minimum of 5 digits is required. So the _complete time-out_ does not apply here. At this point, if the pause is longer than _incomplete time-out_,
 the recognition will end.
 * However, if the user says "one two three four five six" and pauses, the recognizer has a valid recognition result (123456 is allowed
-by the grammar) and the recognition result will end after a pause of _complete time-out_.  You can see here that if the complete time-out is too short, hesitation
+by the grammar) and the recognition result will end after a pause of _complete time-out_. You can see here that if the complete time-out is too short, hesitation
 beyond the 5th digit will cause recognition to end, so you need to consider this while establishing the value.
 
-The _maximum speech timeout_ is the maximum time allowed for speaking.  This value should be greater than the time it reasonnably takes for someone to say a valid answer:
+The _maximum speech timeout_ is the maximum time allowed for speaking. This value should be greater than the time it reasonnably takes for someone to say a valid answer:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 66-66
 
@@ -386,13 +386,13 @@ The _sensitivity_ parameter allows the tuning of the speech detector for barge-i
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 67-67
 
 A value towards 0 will make it harder to barge-in and a value towards 1 will trigger the barge-in for
-non-vocal sounds (e.g. clicks, background noise).  Normally, we don't tune this parameter unless the context is unusual.
+non-vocal sounds (e.g. clicks, background noise). Normally, we don't tune this parameter unless the context is unusual.
 
 The _speed versus accuraccy_ parameter controls the balance beetween speed of speech recognition and accuracy of recognition results:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 68-68
 
-A value towards 0 will make the recognition fast but less accurate.  A value towards 1 will make the speech recognition longer
+A value towards 0 will make the recognition fast but less accurate. A value towards 1 will make the speech recognition longer
 (using more CPU) but more accurate.
 
 All the values passed to those methods can also be `null`, meaning that the platform default should be used.
@@ -407,20 +407,20 @@ First, a `com.nuecho.rivr.voicexml.turn.output.Recording` object must be created
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 59-59
 
-This object allows us to define the recording behaviour.  The `beep` property will make the beginning of the recording
+This object allows us to define the recording behaviour. The `beep` property will make the beginning of the recording
 start with a beep:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 60-60
 
 The `postAudioToServer` (defaults to `true`, explicitly set here for the tutorial purpose) instructs the VoiceXML platform
-to send back the audio file of the recording back to the server.  Doing so will allow the dialogue to manipulate the payload of
+to send back the audio file of the recording back to the server. Doing so will allow the dialogue to manipulate the payload of
 the recording (typically: write the audio file on the filesystem):
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 61-61
 
 Note: Sending the audio file to the server is not the only thing you can do with a recording. The `clientSideAssignationDestination` property can be set in
 order to store the audio file in a VoiceXML variable (i.e. on the platform, the client-side) and be played later in the dialogue using an `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile`
-built from an expression.  See [[Recording with playback]] for more info.
+built from an expression. See [[Recording with playback]] for more info.
 
 The `type` property sets the audio file format:
 
@@ -469,7 +469,7 @@ The `com.nuecho.rivr.voicexml.turn.input.RecordingInfo` also contains the record
 We show in this example how to store the file on disk (on the server-side).
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 86-91
-  
+
 Note that you must also check for the `no-input` event as the user might have remained silence and no message
 has been recorded:
 
@@ -479,16 +479,16 @@ has been recorded:
 
 !set branch recording-to-variable
 
-It is sometimes useful to play back the recorded message to the user in order to get a confirmation.  To do that,
-we just need to temporarly store the audio on the VoiceXML platform.  To do that, we do the same thing as in [[Recording]]
+It is sometimes useful to play back the recorded message to the user in order to get a confirmation. To do that,
+we just need to temporarly store the audio on the VoiceXML platform. To do that, we do the same thing as in [[Recording]]
 except that we add the following:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 62-62
 
-This will store the recorded audio in a VoiceXML variable in the application 
+This will store the recorded audio in a VoiceXML variable in the application
 scope (we will need it later in the dialogue, that's why we need to put it in the `application` scope).
 
-To play back the message, we need to use the `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` audio item.  Since we are going to play a previously 
+To play back the message, we need to use the `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` audio item. Since we are going to play a previously
 recorded file which is stored in a VoiceXML variable, we need to build this `com.nuecho.rivr.voicexml.turn.output.audio.AudioFile` from a JavaScript expression:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 94-97
@@ -509,7 +509,7 @@ First, we need to prepare the interaction:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 24-30
 
-Now we have to deal with the result.  First, we check for events:
+Now we have to deal with the result. First, we check for events:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 31-36
 
@@ -524,9 +524,9 @@ Then, we check the status code:
 !set branch subdialogue-invocation
 
 This example shows how to invoke a VoiceXML subdialogue as defined in the
-[VoiceXML specification](http://www.w3.org/TR/voicexml20/#dml2.3.4). 
+[VoiceXML specification](http://www.w3.org/TR/voicexml20/#dml2.3.4).
 
-The output turn required to invoke a subdialogue is a `com.nuecho.rivr.voicexml.turn.output.SubdialogueCall`.  We pass the URL of the 
+The output turn required to invoke a subdialogue is a `com.nuecho.rivr.voicexml.turn.output.SubdialogueCall`. We pass the URL of the
 subdialogue in the constructor:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 25-25
@@ -539,7 +539,7 @@ The turn will be executed:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-29
 
-The subdialogue return values will be placed in the `value` property of the `com.nuecho.rivr.core.channel.InputTurn`.  Let's assume here
+The subdialogue return values will be placed in the `value` property of the `com.nuecho.rivr.core.channel.InputTurn`. Let's assume here
 that our dialogue returned multiple named values. This will be available in the dialogue as a `JsonObject`:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 31-32
@@ -558,8 +558,8 @@ The sample comes with a sample VoiceXML subdialogue:
 
 This example shows how to invoke a VoiceXML subdialogue which requires HTTP parameters.
 
-We proceed as with [[Invoking a subdialogue]] but we define a `com.nuecho.rivr.voicexml.turn.VariableList` that will contain 
-the various parameters.  Be careful as initial value for each parameter is a JavaScript expression, 
+We proceed as with [[Invoking a subdialogue]] but we define a `com.nuecho.rivr.voicexml.turn.VariableList` that will contain
+the various parameters. Be careful as initial value for each parameter is a JavaScript expression,
 so don't forget relevant quoting:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-32
@@ -575,13 +575,13 @@ We set those parameters in the turn as _submit parameters_:
 This example shows how to invoke a VoiceXML subdialogue which requires VoiceXML parameters (i.e.
 uses `<param>` elements).
 
-We proceed as with [[Invoking a subdialogue]] but we define some `com.nuecho.rivr.voicexml.turn.output.SubdialogueCall.Parameter` objects.  Those 
-objects will be used to create the various `<param>` elements in the generated VoiceXML, so you can either 
+We proceed as with [[Invoking a subdialogue]] but we define some `com.nuecho.rivr.voicexml.turn.output.SubdialogueCall.Parameter` objects. Those
+objects will be used to create the various `<param>` elements in the generated VoiceXML, so you can either
 create them with a regular _value_ or with a JavaScript _expression_:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-32
 
-The `com.nuecho.rivr.voicexml.turn.output.SubdialogueCall.Parameter#createWithValue(java.lang.String, java.lang.String)` expects the parameter name and a string value.  It will yield:
+The `com.nuecho.rivr.voicexml.turn.output.SubdialogueCall.Parameter#createWithValue(java.lang.String, java.lang.String)` expects the parameter name and a string value. It will yield:
 
 ```xml
     <param name="parameter1" value="string" />
@@ -603,13 +603,13 @@ We set those parameters in the turn as _subdialogue parameters_:
 !set branch subdialogue-implementation
 
 To implement a subdialogue is not different from implementing a normal dialogue except that it must end with the
-`<return>` VoiceXML element instead of `<exit>`, `<disconnect>`.  To generate a `<return>`, our dialogue simply need to
-return a `com.nuecho.rivr.voicexml.turn.last.Return`.  The return can either return named values (JavaScript values) or a VoiceXML event.
+`<return>` VoiceXML element instead of `<exit>`, `<disconnect>`. To generate a `<return>`, our dialogue simply need to
+return a `com.nuecho.rivr.voicexml.turn.last.Return`. The return can either return named values (JavaScript values) or a VoiceXML event.
 
 Our dialogue ask for two numbers:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-31
-    
+
 To return those numbers as well as their sum, we prepare a `com.nuecho.rivr.voicexml.turn.VariableList`:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-36
@@ -618,23 +618,23 @@ We need to be careful with variable declarations. Here, since we have numbers, w
 will receive JavaScript numbers, not strings. The resulting VoiceXML will be something like:
 
 ```xml
-    <var name="number1" expr="12" /> 
-    <var name="number2" expr="10" /> 
-    <var name="sum" expr="22" /> 
+    <var name="number1" expr="12" />
+    <var name="number2" expr="10" />
+    <var name="sum" expr="22" />
 ```
 
 We can now pass the `com.nuecho.rivr.voicexml.turn.VariableList` in the `com.nuecho.rivr.voicexml.turn.last.Return`:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 38-39
 
-We also show here how to return an event by using the other constructor. Event name is passed in the 
+We also show here how to return an event by using the other constructor. Event name is passed in the
 second parameter and message (optional) is passed in the third parameter:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 40-43
 
 Here's a sample VoiceXML document invoking the subdialogue:
 
-!inline src/main/webapp/main.vxml 
+!inline src/main/webapp/main.vxml
 
 To try the example, the VoiceXML platform initial URL should be `http://<yourhostname>:8080/rivr-cookbook/main.vxml`
 
@@ -642,24 +642,24 @@ To try the example, the VoiceXML platform initial URL should be `http://<yourhos
 
 !set branch subdialogue-implementation-voicexml-parameter
 
-First, make sure you understand the [[Implementing a subdialogue]] example.  The following example will show you
-how to read the parameters sent to a subdialogue using the `<param>` VoiceXML element: 
+First, make sure you understand the [[Implementing a subdialogue]] example. The following example will show you
+how to read the parameters sent to a subdialogue using the `<param>` VoiceXML element:
 
 !inline src/main/webapp/main.vxml 5-7
-    
-We are going the obtain the subdialogue parameters by declaring variables in the first output turn of the dialogue:   
+
+We are going the obtain the subdialogue parameters by declaring variables in the first output turn of the dialogue:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 29-31
 
-Note that the variable declaration can contain an initial expression.  In this case, the expression will act as the 
-default value of the parameters.  This is shown above with the `promptText2` parameter.
+Note that the variable declaration can contain an initial expression. In this case, the expression will act as the
+default value of the parameters. This is shown above with the `promptText2` parameter.
 
 Those declaration must be included in a `com.nuecho.rivr.voicexml.turn.output.Script` turn:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 33-34
 
 This turn is then executed and the subdialogue parameters are available as properties of the `jsonValue`:
-  
+
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 36-39
 
 # Using vendor-specific VoiceXML platform extensions
@@ -670,7 +670,7 @@ This turn is then executed and the subdialogue parameters are available as prope
 
 !set branch genesys-gvp-uuid
 
-GVP Call UUID is exposed under `session.connection.uuid`.  We use a `com.nuecho.rivr.voicexml.turn.output.Script` turn to retrieve it:
+GVP Call UUID is exposed under `session.connection.uuid`. We use a `com.nuecho.rivr.voicexml.turn.output.Script` turn to retrieve it:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 19-36
 
@@ -678,7 +678,7 @@ GVP Call UUID is exposed under `session.connection.uuid`.  We use a `com.nuecho.
 
 !set branch genesys-gvp-session-id
 
-GVP Session ID is exposed under `session.com.genesyslab.sessionid`.  We use a `com.nuecho.rivr.voicexml.turn.output.Script` turn to retrieve it:
+GVP Session ID is exposed under `session.com.genesyslab.sessionid`. We use a `com.nuecho.rivr.voicexml.turn.output.Script` turn to retrieve it:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 19-37
 
@@ -688,7 +688,7 @@ GVP Session ID is exposed under `session.com.genesyslab.sessionid`.  We use a `c
 
 This example assumes a SIP Server integration (not the CTI connector).
 
-This example shows how to extract user data sent by the SIP Server at the beggining of the call.  The SIP server sends the user
+This example shows how to extract user data sent by the SIP Server at the beggining of the call. The SIP server sends the user
 data in specific headers of the SIP INVITE message, typically the ones prefixed with `X-Genesys-`:
 
     X-Genesys-CustomerName: Peter Johnson
@@ -708,7 +708,7 @@ SIP Server to GVP in the SIP INVITE _at the beggining of the call_.
 
 ### Simple dialogue tests
 
-Unit testing is one of Rivr most notable feature. It allows the developer to perform non-regression testing with automated tools.  Using this technique, you can
+Unit testing is one of Rivr most notable feature. It allows the developer to perform non-regression testing with automated tools. Using this technique, you can
 simulate hundreds of call in seconds.
 
 !set branch junit-dialogue-test
@@ -717,7 +717,7 @@ Suppose we have a simple dialogue and we want to write unit tests for it:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 25-79
 
-We first need to write a unit test class in which we will initialize a `com.nuecho.rivr.voicexml.test.VoiceXmlTestDialogueChannel` which is an implementation of `com.nuecho.rivr.core.channel.DialogueChannel` used for testing.  This implementation allows us to simulate responses from the VoiceXML platform such as recognition results and no-match events.
+We first need to write a unit test class in which we will initialize a `com.nuecho.rivr.voicexml.test.VoiceXmlTestDialogueChannel` which is an implementation of `com.nuecho.rivr.core.channel.DialogueChannel` used for testing. This implementation allows us to simulate responses from the VoiceXML platform such as recognition results and no-match events.
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 31-34
 
@@ -739,7 +739,7 @@ We have used the `startDialogue()` helper method to do so:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 139-141
 
-We then need to perform some kind of check to validate that the dialogue is executing correctly.  We know that the first thing the dialogue should do is to play the welcome message, so let's verify that:
+We then need to perform some kind of check to validate that the dialogue is executing correctly. We know that the first thing the dialogue should do is to play the welcome message, so let's verify that:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 46-46
 
@@ -752,7 +752,7 @@ The `assertMessage()` method ensure that the dialogue is generating a `com.nuech
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 161-166
 
 Note that in this method, we use the `com.nuecho.rivr.core.test.TestDialogueChannel#getLastStepAsOutputTurn()` method on our test dialogue channel to query the last _step_ that
-occured in the channel.  The step can be one of:
+occured in the channel. The step can be one of:
 
 * Output turn
 * Last turn
@@ -769,12 +769,12 @@ So the `assertMessage()` method will ensure
 1. that we have, at this point in the dialogue, an `com.nuecho.rivr.core.channel.OutputTurn` for which the type is `com.nuecho.rivr.voicexml.turn.output.Message`
 2. that the audio items of this message turn are as expected
 
-Note that we are only asserting some aspects of the `com.nuecho.rivr.voicexml.turn.output.Message`.  We didn't test neither the `language` nor `barge-in` properties.
-Thus it's possible to make the test cases as sophisticated as needed.  There's always a trade-off between what is actually asserted in
-unit tests and the effort required to develop those test cases.  You have control over what you depth of assertion for each turn.
+Note that we are only asserting some aspects of the `com.nuecho.rivr.voicexml.turn.output.Message`. We didn't test neither the `language` nor `barge-in` properties.
+Thus it's possible to make the test cases as sophisticated as needed. There's always a trade-off between what is actually asserted in
+unit tests and the effort required to develop those test cases. You have control over what you depth of assertion for each turn.
 
-Geting back at our example, now we'll simulate the VoiceXML platform response.  In this case, since we have a message, the only possible response
-from the platform (beside an `error` event) is what we call a _no-action_, i.e. an input turn without any property set.  In order to simulate this platform response, we invoke the
+Geting back at our example, now we'll simulate the VoiceXML platform response. In this case, since we have a message, the only possible response
+from the platform (beside an `error` event) is what we call a _no-action_, i.e. an input turn without any property set. In order to simulate this platform response, we invoke the
 `com.nuecho.rivr.voicexml.test.VoiceXmlTestDialogueChannel#processNoAction()` method on the dialogue channel:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 48-48
@@ -817,8 +817,8 @@ With `assertExit()` defined as:
 
 !inline src/test/java/com/nuecho/rivr/cookbook/test/DialogueTest.java 184-190
 
-If we only run JUnit for the test case `testNormal()` we do not completely every outcome of the callflow.  This can be verified by running JUnit in conjunction
-with a coverage tool.  I will be using [Emma](http://emma.sourceforge.net/) with the [Eclipse plug-in](http://www.eclemma.org/):
+If we only run JUnit for the test case `testNormal()` we do not completely every outcome of the callflow. This can be verified by running JUnit in conjunction
+with a coverage tool. I will be using [Emma](http://emma.sourceforge.net/) with the [Eclipse plug-in](http://www.eclemma.org/):
 
 ![Emma code coverage in Eclipse](http://nuecho.github.io/rivr/cookbook-resources/0.9.3/eclipse-coverage-1.png "Emma code coverage in Eclipse")
 
@@ -848,8 +848,8 @@ Now in the bean factory configuration file, we can provide some definitions for 
 
 !inline src/main/webapp/WEB-INF/applicationContext.xml
 
-We make those beans as _prototype_, meaning that they are reinstanciated each time they are requested.  This is required
-if the dialogue class is stateful (which is not really the case in our example).  A stateless dialogue bean can be
+We make those beans as _prototype_, meaning that they are reinstanciated each time they are requested. This is required
+if the dialogue class is stateful (which is not really the case in our example). A stateless dialogue bean can be
 shared across many "phone calls" while a stateful dialogue bean can only used by one call.
 
 You need to set the application context in the web.xml:
@@ -1087,7 +1087,7 @@ a `com.nuecho.rivr.voicexml.turn.output.VoiceXmlOutputTurn` or
 
 !set branch http-parameters
 
-This example shows how to extract HTTP parameters and used them in a dialogue.  The parameters can be passed in the query string (e.g. `http://localhost:8080/rivr-cookbook/dialogue?name=value`) or in the body of the request (content-type: application/x-www-form-urlencoded), such as a POST. 
+This example shows how to extract HTTP parameters and used them in a dialogue. The parameters can be passed in the query string (e.g. `http://localhost:8080/rivr-cookbook/dialogue?name=value`) or in the body of the request (content-type: application/x-www-form-urlencoded), such as a POST.
 
 HTTP parameters can be obtained in the `com.nuecho.rivr.voicexml.turn.first.VoiceXmlFirstTurn` with the `com.nuecho.rivr.voicexml.turn.first.VoiceXmlFirstTurn#getParameters()` method:
 
@@ -1103,7 +1103,7 @@ Here, we use the parameters names and values to play a message:
 
 !set branch clid-dnis
 
-This example shows how to get the CLID (also known as ANI) and DNIS from the VoiceXML platform.  To do that, we need to read two read-only
+This example shows how to get the CLID (also known as ANI) and DNIS from the VoiceXML platform. To do that, we need to read two read-only
 [variables specified by the VoiceXML specification](http://www.w3.org/TR/voicexml20/#dml5.1.4):
 
 > `session.connection.local.uri`
@@ -1114,7 +1114,7 @@ This example shows how to get the CLID (also known as ANI) and DNIS from the Voi
 
 >> This variable is a URI which addresses the remote caller device.
 
-To create a VoiceXML document reading platform variables, we use the `com.nuecho.rivr.voicexml.turn.output.Script` turn.  This turn will generate a VoiceXML document that will perform the following step:
+To create a VoiceXML document reading platform variables, we use the `com.nuecho.rivr.voicexml.turn.output.Script` turn. This turn will generate a VoiceXML document that will perform the following step:
 
 1. Initialize some variables with some optional expression.
 2. Execute an optional script
@@ -1133,8 +1133,8 @@ We execute the turn:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 30-30
 
-To retrieve the result, we cast the result from `com.nuecho.rivr.voicexml.turn.input.VoiceXmlInputTurn#getValue()` into a `JsonObject`.  The affected values for the variables can be obtained as property of this object:
+To retrieve the result, we cast the result from `com.nuecho.rivr.voicexml.turn.input.VoiceXmlInputTurn#getValue()` into a `JsonObject`. The affected values for the variables can be obtained as property of this object:
 
 !inline src/main/java/com/nuecho/rivr/cookbook/dialogue/Dialogue.java 32-35
 
-Note that the CLID and DNIS obtained this way are URI.  If you have a SIP IVR platform integrated with the PSTN, you are likely to get SIP URI (e.g. `sip:+15145551234@proxy.example.com`) so you probably need to do some parsing in order to extract the numeric value of the SIP URI.
+Note that the CLID and DNIS obtained this way are URI. If you have a SIP IVR platform integrated with the PSTN, you are likely to get SIP URI (e.g. `sip:+15145551234@proxy.example.com`) so you probably need to do some parsing in order to extract the numeric value of the SIP URI.
