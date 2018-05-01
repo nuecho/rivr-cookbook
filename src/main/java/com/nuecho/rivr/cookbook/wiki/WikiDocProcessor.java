@@ -234,7 +234,9 @@ public class WikiDocProcessor {
                         Matcher methodPartMatcher = RIVR_JAVA_ITEM_METHOD_PART.matcher(item);
 
                         if (methodPartMatcher.find()) {
-                            uri += "#" + methodPartMatcher.group(1);
+                            String methodNameAndArguments = methodPartMatcher.group(1);
+                            methodNameAndArguments = methodNameAndArguments.replaceAll(" ", "%20");
+							uri += "#" + methodNameAndArguments;
                             String methodName = methodPartMatcher.group(2);
                             displayItem = methodName;
                         } else {
