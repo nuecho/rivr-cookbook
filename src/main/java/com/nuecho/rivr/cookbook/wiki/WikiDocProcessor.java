@@ -359,7 +359,7 @@ public class WikiDocProcessor {
         writer.println("![Rivr logo](http://rivr.nuecho.com/img/logo.png)");
         writer.println();
         writer.println("# Cookbook");
-        writer.println("_A collection a various recipes explaining how to achieve various tasks with Rvir_");
+        writer.println("_A collection a various recipes explaining how to achieve various tasks with Rivr_");
         writer.println();
         writer.println("</center>");
 
