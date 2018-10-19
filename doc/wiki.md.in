@@ -854,7 +854,7 @@ shared across many "phone calls" while a stateful dialogue bean can only used by
 
 You need to set the application context in the web.xml:
 
-!inline src/main/webapp/WEB-INF/web.xml 11-13
+!inline src/main/webapp/WEB-INF/web.xml 8-10
 
 We can define a custom dialogue factory that will lookup the dialogue in the bean factory according to
 the value of the `dialogue` HTTP parameter:
@@ -863,7 +863,7 @@ the value of the `dialogue` HTTP parameter:
 
 You need to place the name of the dialogue factory class in the `web.xml`:
 
-!inline src/main/webapp/WEB-INF/web.xml 19-22
+!inline src/main/webapp/WEB-INF/web.xml 16-19
 
 You can try it with the following URI:
 
