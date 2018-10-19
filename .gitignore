@@ -1,8 +1,3 @@
 build/
-.classpath
-.project
-.gradle/
-.settings/gradle/
-org.eclipse.jdt.groovy.core.prefs
-org.springsource.ide.eclipse.gradle.core.prefs
-org.springsource.ide.eclipse.gradle.refresh.prefs
+.gradle
+bin/
