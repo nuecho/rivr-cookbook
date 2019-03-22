@@ -356,7 +356,7 @@ public class WikiDocProcessor {
                                              String repository) {
 
         writer.println("<center>\n");
-        writer.println("![Rivr logo](http://rivr.nuecho.com/img/logo.png)");
+        writer.println("![Rivr logo](http://nuecho.github.io/rivr/images/rivr-logo.png)");
         writer.println();
         writer.println("# Cookbook");
         writer.println("_A collection a various recipes explaining how to achieve various tasks with Rivr_");
