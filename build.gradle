@@ -13,5 +13,5 @@ targetCompatibility = "1.8"
 
 dependencies {
     implementation 'com.nuecho:rivr-voicexml:+'
-    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.9.0'
+    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.3.2'
 }
