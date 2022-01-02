@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean name="x" class="com.nuecho.rivr.cookbook.dialogue.Dialogue" scope="prototype">
+    <property name="message">
+      <value>This is a message from bean X.</value>
+    </property>
+  </bean>
+
+  <bean name="y" class="com.nuecho.rivr.cookbook.dialogue.Dialogue" scope="prototype">
+    <property name="message">
+      <value>This is a message from bean Y.</value>
+    </property>
+  </bean>
+
+</beans>

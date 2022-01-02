@@ -5,13 +5,17 @@
 
   <display-name>Dialogue Engine</display-name>
 
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>Dialogue</servlet-name>
     <servlet-class>com.nuecho.rivr.voicexml.servlet.VoiceXmlDialogueServlet</servlet-class>
 
     <init-param>
-      <param-name>com.nuecho.rivr.voicexml.dialogue.class</param-name>
-      <param-value>com.nuecho.rivr.cookbook.dialogue.Dialogue</param-value>
+      <param-name>com.nuecho.rivr.voicexml.dialogueFactory.class</param-name>
+      <param-value>com.nuecho.rivr.cookbook.dialogue.DialogueFactory</param-value>
     </init-param>
   </servlet>
 
